@@ -16,7 +16,7 @@
 # include <readline/history.h>
 # include "libft.h"
 
-/* Структуры и прототипы добавляются по фазам. */
+/* Les structures et les prototypes sont ajoutés par phases. */
 extern volatile sig_atomic_t g_sig;
 
 void setup_signal_handlers(void);

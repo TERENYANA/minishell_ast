@@ -30,8 +30,8 @@ void	print_tokens(t_token *tokens)
 	while (tokens)
 	{
 		printf("Token [%d]: \"%s\"\n", i, tokens->value ? tokens->value : "(null)");
-		/* Если у вас в структуре t_token есть поле типа (type), 
-		   можно раскомментировать строку ниже для вывода типа: */
+		/* Si vous avez un champ de type (type) dans la structure t_token, 
+		   vous pouvez décommenter la ligne ci-dessous pour afficher le type : */
 		// printf("  -> Type: %d\n", tokens->type);
 		
 		tokens = tokens->next;

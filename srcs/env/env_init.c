@@ -1,4 +1,4 @@
-#include "minishell.h"
+#include "../minishell.h"
 
 t_var	*new_var(char *envp_line)
 {
@@ -26,10 +26,10 @@ t_var	*new_var(char *envp_line)
 }
 
 
-// Эта функция принимает одну строку из envp (например, "USER=yana") и создаёт из неё новый узел списка переменных окружения.
+// Cette fonction prend une chaîne de envp (par exemple, "USER=yana") et crée un nouveau nœud dans la liste des variables d'environnement.
 
 
-//Эта функция добавляет новый узел node в конец списка, заданного указателями head и tail.
+// Cette fonction ajoute un nouveau nœud "node" à la fin de la liste définie par les pointeurs head et tail.
 static void	append_var(t_var **head, t_var **tail, t_var *node)
 {
 	if (!*head)

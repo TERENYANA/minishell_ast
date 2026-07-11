@@ -19,7 +19,7 @@ void setup_signal_handlers(void)
 
     sa.sa_handler = on_signal_prompt; // Set the signal handler function
     sigemptyset(&sa.sa_mask); // Initialize the signal mask to be empty (no signals are blocked during the execution of the handler)
-    sa.sa_flags = 0; /* без SA_RESTART: чтобы readline прервалась */
+    sa.sa_flags = 0; /* sans SA_RESTART : pour que readline soit interrompue */
     sigaction(SIGINT, &sa, NULL);
     signal(SIGQUIT, SIG_IGN);
 }
@@ -29,15 +29,15 @@ void	ignore_signals(void)
 	signal(SIGINT, SIG_IGN);
 	signal(SIGQUIT, SIG_IGN);
 }
-//Эта функция временно отключает реакцию на Ctrl+C и Ctrl+\ для главного процесса шелла.
+// Cette fonction désactive temporairement la réaction à Ctrl+C et Ctrl+\ pour le processus principal du shell.
 
-/* heredoc-обработчик: закрыть stdin, чтобы readline в heredoc-цикле
- * получила NULL. Потребуется в Phase 12. */
+/* Gestionnaire de heredoc : fermer stdin pour que readline dans la boucle heredoc
+ * reçoive NULL. Sera nécessaire à la Phase 12. */
 static void	on_signal_heredoc(int signo)
 {
 	g_sig = signo;
 	close(STDIN_FILENO);
-}//Это обработчик Ctrl+C специально для режима Here-doc.
+}// C'est le gestionnaire de Ctrl+C spécialement pour le mode Here-doc.
 
 void	setup_heredoc_signals(void)
 {

@@ -10,11 +10,11 @@ LDLIBS   := -L$(READLINE_PREFIX)/lib -lreadline -Llibft -lft
 SRCS       := \
 	srcs/main.c \
 	srcs/signals.c \
-	srcs/env_init.c \
+	srcs/env/env_init.c \
 	srcs/free.c \
 	srcs/debug.c \
-	srcs/env_get.c \
-	srcs/env_set.c \
+	srcs/env/env_get.c \
+	srcs/env/env_set.c \
 	srcs/error.c \
 	srcs/lexer/lexer.c \
 	srcs/lexer/token.c \

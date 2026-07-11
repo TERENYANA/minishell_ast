@@ -10,7 +10,7 @@ int	is_whitespace(char c)
 	return (c == ' ' || c == '\t');
 }
 
-/* Длина закавыченного участка с включением закрывающей кавычки. -1, если незакрыта. */
+/* Longueur de la section entre guillemets, incluant le guillemet fermant. -1 si non fermé. */
 static int	quoted_len(char *s)
 {
 	char	q;

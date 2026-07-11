@@ -1,4 +1,4 @@
-#include "minishell.h"
+#include "../minishell.h"
 
 char    *get_env_value(char *name, t_var *env)
 {
@@ -43,7 +43,7 @@ char    **convert_env_list(t_var *env)
     char    **arr;
     int     i;
 
-    // Выделяем память и сразу заполняем её нулями (\0 / NULL)
+    // Nous allouons de la mémoire et la remplissons immédiatement avec des zéros (\0 / NULL)
     arr = ft_calloc(count_valued(env) + 1, sizeof(char *));
     if (!arr)
         return (NULL);
@@ -59,6 +59,6 @@ char    **convert_env_list(t_var *env)
         }
         env = env->next;
     }
-    // так как ft_calloc уже занулил весь массив изначально.
+    // car ft_calloc a déjà initialisé tout le tableau à zéro.
     return (arr);
 }
