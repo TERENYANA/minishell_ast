@@ -15,7 +15,6 @@ CONSTRUCTION
 11  Pipeline |
 12  Heredoc
 13  Valgrind
-# 🐚 minishell — documentation (Phases 0–5)
 
 # 🐚 minishell — Documentation complète (Phases 0–5)
 
