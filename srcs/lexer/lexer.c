@@ -2,7 +2,8 @@
 
 int	is_special(char c)
 {
-	return (c == '|' || c == '<' || c == '>');
+	return (c == '|' || c == '<' || c == '>'
+		|| c == '&' || c == '(' || c == ')');
 }
 
 int	is_whitespace(char c)
@@ -32,7 +33,8 @@ int	get_token_len(char *s)
 
 	if (is_special(s[0]))
 	{
-		if ((s[0] == '<' && s[1] == '<') || (s[0] == '>' && s[1] == '>'))
+		if ((s[0] == '<' && s[1] == '<') || (s[0] == '>' && s[1] == '>')
+			|| (s[0] == '&' && s[1] == '&') || (s[0] == '|' && s[1] == '|'))
 			return (2);
 		return (1);
 	}

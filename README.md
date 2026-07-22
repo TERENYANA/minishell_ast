@@ -1,20 +1,19 @@
-
 CONSTRUCTION
 
-00  Setup & Makefile
-01  Boucle REPL
-02  Signaux (prompt)
-03  Environnement
-04  Lexer
-05  Syntaxe
-06  Parseur (AST)
-07  Expansion des $
-08  Builtins
-09  Une commande
-10  Redirections
-11  Pipeline |
-12  Heredoc
-13  Valgrind
+00 Setup & Makefile
+01 Boucle REPL
+02 Signaux (prompt)
+03 Environnement
+04 Lexer
+05 Syntaxe
+06 Parseur (AST)
+07 Expansion des $
+08 Builtins
+09 Une commande
+10 Redirections
+11 Pipeline |
+12 Heredoc
+13 Valgrind
 
 # 🐚 minishell — Documentation complète (Phases 0–5)
 
@@ -99,22 +98,24 @@ LDLIBS   := -L$(READLINE_PREFIX)/lib -lreadline -Llibft -lft
 
 ### Comment lire les erreurs de build
 
-| Erreur | Étape | Cause | Solution |
-|--------|-------|-------|----------|
-| `implicit function declaration` | compilation | prototype absent | ajouter le prototype dans le `.h` |
-| `Undefined symbols` | édition de liens | le corps de la fonction n'existe dans aucun `.o` | ajouter le fichier `.c` dans `SRCS` |
-| `No rule to make target 'X.o'` | make | le fichier `X.c` n'existe pas sur le disque | vérifier le chemin / créer le fichier |
+| Erreur                          | Étape            | Cause                                            | Solution                              |
+| ------------------------------- | ---------------- | ------------------------------------------------ | ------------------------------------- |
+| `implicit function declaration` | compilation      | prototype absent                                 | ajouter le prototype dans le `.h`     |
+| `Undefined symbols`             | édition de liens | le corps de la fonction n'existe dans aucun `.o` | ajouter le fichier `.c` dans `SRCS`   |
+| `No rule to make target 'X.o'`  | make             | le fichier `X.c` n'existe pas sur le disque      | vérifier le chemin / créer le fichier |
 
 > 🔑 Réflexe : **chaque nouveau fichier `.c` créé → immédiatement ajouté dans `SRCS`.**
 
 ## Tests
 
 **T0.1 — Compilation sans warnings.**
+
 ```
 $ make
 ```
 
 **T0.2 — Le binaire se lance et sort.**
+
 ```
 $ ./minishell
 $ echo $?
@@ -122,6 +123,7 @@ $ echo $?
 ```
 
 **T0.3 — make clean / fclean / re.**
+
 ```
 $ make clean
 $ make fclean
@@ -129,12 +131,14 @@ $ make re
 ```
 
 **T0.4 — Pas de relink.**
+
 ```
 $ make && make
 make: Nothing to be done for 'all'.
 ```
 
 **T0.5 — Les dépendances fonctionnent.**
+
 ```
 $ touch minishell.h && make
 # tous les .o se recompilent
@@ -150,7 +154,7 @@ Le prompt `minishell$` apparaît. readline lit une ligne. Ctrl-D quitte propreme
 
 ## Concept
 
-**REPL** = Read–Eval–Print–Loop. Chaque itération est *un univers séparé* : les objets malloc'és dans une itération **doivent mourir à la fin de celle-ci**.
+**REPL** = Read–Eval–Print–Loop. Chaque itération est _un univers séparé_ : les objets malloc'és dans une itération **doivent mourir à la fin de celle-ci**.
 
 > 🧠 La compétence principale du projet : le réflexe « je reçois un pointeur → je mémorise immédiatement qui va le libérer ».
 
@@ -245,6 +249,7 @@ int	main(int argc, char **argv, char **envp)
 ## Tests
 
 **T1.1 — Ctrl-D quitte.**
+
 ```
 $ ./minishell
 minishell$ [Ctrl-D]
@@ -254,6 +259,7 @@ $ echo $?
 ```
 
 **T1.2 — Lignes vides.**
+
 ```
 minishell$
 minishell$
@@ -261,6 +267,7 @@ minishell$        # pas de crash, pas d'affichage parasite
 ```
 
 **T1.3 — Le stub répond.**
+
 ```
 minishell$ hello world
 got: 'hello world'
@@ -269,6 +276,7 @@ got: 'hello world'
 **T1.4 — L'historique fonctionne.** Tape une commande, puis ↑ — elle réapparaît.
 
 **T1.5 — Valgrind propre.**
+
 ```
 $ valgrind --leak-check=full ./minishell
 minishell$ hello
@@ -294,12 +302,12 @@ Dans un shell, les signaux (`Ctrl+C`, `Ctrl+\`) sont des **interruptions asynchr
 
 **`sig_atomic_t` (garantie d'atomicité).** Ce type garantit que la lecture ou l'écriture se fait en **une seule instruction processeur**. Le CPU ne peut physiquement pas être interrompu « au milieu » d'une modification.
 
-- *Sans lui :* si un signal interrompt l'écriture d'une variable ordinaire (ex. un `long` sur 2 instructions), le handler lit une « bouillie » — moitié anciennes données, moitié nouvelles (**race condition**).
-- *Avec lui :* l'opération est indivisible. Le handler voit soit strictement l'ancienne valeur, soit strictement la nouvelle.
+- _Sans lui :_ si un signal interrompt l'écriture d'une variable ordinaire (ex. un `long` sur 2 instructions), le handler lit une « bouillie » — moitié anciennes données, moitié nouvelles (**race condition**).
+- _Avec lui :_ l'opération est indivisible. Le handler voit soit strictement l'ancienne valeur, soit strictement la nouvelle.
 
 **`volatile` (interdiction d'optimisation).** Indique au compilateur que la variable peut changer « de l'extérieur » (dans le handler). Force la lecture **directement depuis la RAM** à chaque accès, interdit le cache en registre.
 
-- *Sans lui :* une boucle `while (g_sig == 0)` devient infinie — le compilateur « optimise » et ne relit jamais la RAM.
+- _Sans lui :_ une boucle `while (g_sig == 0)` devient infinie — le compilateur « optimise » et ne relit jamais la RAM.
 
 **`extern` (visibilité globale).** Permet d'utiliser la même variable dans tous les fichiers (`main.c`, `signals.c`, ...) via le header commun. La **définition** (sans extern, avec `= 0`) existe en un seul exemplaire dans `signals.c` :
 
@@ -357,6 +365,7 @@ void	ignore_signals(void)
 ## setup_signal_handlers — ligne par ligne
 
 **`struct sigaction sa;`** — structure de configuration du handler, définie dans `<signal.h>` :
+
 - `sa_handler` : pointeur vers la fonction-handler
 - `sa_mask` : masque des signaux bloqués pendant l'exécution du handler
 - `sa_flags` : flags modifiant le comportement
@@ -393,27 +402,30 @@ Le paramètre `signo` est fourni par le noyau : c'est le numéro du signal reçu
 
 ## Carte des trois contextes de signaux (pour la suite)
 
-| Contexte | SIGINT | SIGQUIT | Phase |
-|----------|--------|---------|-------|
-| **prompt** | nouvelle ligne + redraw | ignoré | 2 ✅ |
-| **attente d'un enfant** | ignoré par le parent (l'enfant le reçoit) | ignoré par le parent | 9 |
-| **heredoc** | `close(stdin)` pour interrompre readline | ignoré | 12 |
+| Contexte                | SIGINT                                    | SIGQUIT              | Phase |
+| ----------------------- | ----------------------------------------- | -------------------- | ----- |
+| **prompt**              | nouvelle ligne + redraw                   | ignoré               | 2 ✅  |
+| **attente d'un enfant** | ignoré par le parent (l'enfant le reçoit) | ignoré par le parent | 9     |
+| **heredoc**             | `close(stdin)` pour interrompre readline  | ignoré               | 12    |
 
 ## Tests
 
 **T2.1 — Ctrl-C sur prompt vide.**
+
 ```
 minishell$ [Ctrl-C]
 minishell$            # nouvelle ligne, prompt propre
 ```
 
 **T2.2 — Ctrl-C avec texte tapé.**
+
 ```
 minishell$ bonjour[Ctrl-C]
 minishell$            # « bonjour » a disparu
 ```
 
 **T2.3 — Ctrl-\ ne fait rien.**
+
 ```
 minishell$ [Ctrl-\]
 minishell$
@@ -435,11 +447,11 @@ Lire `envp` dans notre liste chaînée `t_var`. `get_env_value`, `env_set`, `env
 
 Une chaîne `"NAME=value"` contient un `=`. Une chaîne `"NAME"` sans `=` est « **déclarée sans valeur** » → `value = NULL`. La distinction est essentielle :
 
-| Dans la liste | `env` l'affiche ? | `export` l'affiche ? | Passée à execve ? |
-|---------------|:---:|:---:|:---:|
-| `value="bar"` | ✅ `FOO=bar` | ✅ `declare -x FOO="bar"` | ✅ |
-| `value=""` | ✅ `FOO=` | ✅ `declare -x FOO=""` | ✅ |
-| `value=NULL` | ❌ | ✅ `declare -x FOO` | ❌ |
+| Dans la liste | `env` l'affiche ? |   `export` l'affiche ?    | Passée à execve ? |
+| ------------- | :---------------: | :-----------------------: | :---------------: |
+| `value="bar"` |   ✅ `FOO=bar`    | ✅ `declare -x FOO="bar"` |        ✅         |
+| `value=""`    |     ✅ `FOO=`     |  ✅ `declare -x FOO=""`   |        ✅         |
+| `value=NULL`  |        ❌         |    ✅ `declare -x FOO`    |        ❌         |
 
 > 🔑 `value=NULL` ≠ `value=""`. Vérifie dans bash : `export FOO=` puis `export BAR` → `env | grep BAR` n'affiche rien, mais `export | grep BAR` affiche `declare -x BAR`.
 
@@ -449,11 +461,11 @@ Le 3e paramètre de `main` : un tableau de chaînes `"NAME=value"` terminé par 
 
 Pourquoi le copier dans une liste chaînée ? Parce qu'un tableau plat est pénible à **modifier** :
 
-| Opération | `char **` | liste chaînée |
-|-----------|-----------|---------------|
-| ajouter (`export`) | realloc de tout le tableau | malloc d'un nœud |
-| supprimer (`unset`) | décaler toute la queue | reconnecter 2 pointeurs |
-| modifier (`cd` → PWD) | realloc si plus long | free + remplacer un champ |
+| Opération             | `char **`                  | liste chaînée             |
+| --------------------- | -------------------------- | ------------------------- |
+| ajouter (`export`)    | realloc de tout le tableau | malloc d'un nœud          |
+| supprimer (`unset`)   | décaler toute la queue     | reconnecter 2 pointeurs   |
+| modifier (`cd` → PWD) | realloc si plus long       | free + remplacer un champ |
 
 ## La structure
 
@@ -528,7 +540,7 @@ static void	append_var(t_var **head, t_var **tail, t_var *node)
 }
 ```
 
-**Pourquoi des doubles pointeurs `t_var **` ?** Parce qu'on modifie les pointeurs eux-mêmes (le premier nœud devient la tête). Avec un simple `t_var *`, on modifierait une copie locale.
+**Pourquoi des doubles pointeurs `t_var **`?** Parce qu'on modifie les pointeurs eux-mêmes (le premier nœud devient la tête). Avec un simple`t_var \*`, on modifierait une copie locale.
 
 **Pourquoi un `tail` ?** Ajout en O(1). Sans tail, chaque ajout parcourt la liste → O(n²) pour construire (72² ≈ 5000 opérations au lieu de 72).
 
@@ -561,7 +573,7 @@ t_var	*create_env(char **envp)
 
 **`envp && envp[i]`** — double protection : envp lui-même peut être NULL (`env -i` extrême), et `envp[i] == NULL` marque la fin du tableau (convention POSIX).
 
-**En cas d'échec de new_var :** `ft_free_env(head)` libère la partie déjà construite avant de retourner NULL. Pattern général du projet : *« si ça casse au milieu, nettoie ce que tu as construit »*.
+**En cas d'échec de new_var :** `ft_free_env(head)` libère la partie déjà construite avant de retourner NULL. Pattern général du projet : _« si ça casse au milieu, nettoie ce que tu as construit »_.
 
 ## Fichier env_get.c — lecture
 
@@ -582,7 +594,7 @@ char	*get_env_value(char *name, t_var *env)
 
 Recherche linéaire O(n). Retourne un pointeur **vers l'intérieur de la liste** — pas une copie. L'appelant ne doit **jamais** le libérer. Retourne NULL à la fois pour « variable absente » et « variable à value=NULL » — pour l'expansion (`$FOO`), les deux donnent une chaîne vide, donc c'est voulu. Pour les distinguer (dans `export`), on utilise `find_var`.
 
-### convert_env_list — liste → char** pour execve
+### convert_env_list — liste → char\*\* pour execve
 
 ```c
 static int	count_valued(t_var *env)      /* compte les value != NULL */
@@ -663,18 +675,19 @@ static void	env_remove(t_var **env, t_var *node)
 
 Quatre cas couverts par deux if :
 
-| Cas | prev | next | Effet |
-|-----|------|------|-------|
-| milieu | ✅ | ✅ | les voisins se reconnectent entre eux |
-| tête | ❌ | ✅ | `*env` avance, le nouveau premier a `prev=NULL` |
-| queue | ✅ | ❌ | l'avant-dernier perd son next |
-| unique | ❌ | ❌ | `*env = NULL`, liste vide |
+| Cas    | prev | next | Effet                                           |
+| ------ | ---- | ---- | ----------------------------------------------- |
+| milieu | ✅   | ✅   | les voisins se reconnectent entre eux           |
+| tête   | ❌   | ✅   | `*env` avance, le nouveau premier a `prev=NULL` |
+| queue  | ✅   | ❌   | l'avant-dernier perd son next                   |
+| unique | ❌   | ❌   | `*env = NULL`, liste vide                       |
 
 `env_unset` cherche par nom (`find_var`) et supprime si trouvé. Un nom inexistant est **silencieusement ignoré** — comme bash (`unset NOPE ; echo $?` → 0).
 
 ## Tests
 
 **T3.1 — La liste est complète.**
+
 ```
 $ env | wc -l
 50
@@ -682,11 +695,13 @@ $ ./minishell          # print_env (debug) affiche 50 lignes
 ```
 
 **T3.2 — Environnement vide.**
+
 ```
 $ env -i ./minishell   # 0 lignes, pas de crash
 ```
 
 **T3.3 — Valgrind propre.**
+
 ```
 $ valgrind --leak-check=full ./minishell
 [Ctrl-D]  →  0 definitely lost
@@ -695,6 +710,7 @@ $ valgrind --leak-check=full ./minishell
 **T3.4 — PATH est correct.** Comparer avec `echo $PATH` dans bash.
 
 **T3.5 à T3.8 — Tests unitaires** (petit main de test) :
+
 - `env_set` crée puis met à jour : `bar` → `baz`, l'ancienne valeur est libérée
 - `env_unset` sur la tête / le milieu / la queue / l'unique nœud
 - `env_unset("INEXISTANT")` ne crashe pas
@@ -871,20 +887,20 @@ Exemples : `"abc"` → 5 · `''` → 2 · `"x` → -1 · `"$U"trail` → 4 (on s
 
 **Branche opérateurs :** si `s[0]` est spécial → longueur 1, ou 2 pour les doubles `<<` / `>>`.
 
-**Branche mot :** on avance tant que le caractère n'est ni fin de chaîne, ni espace, ni opérateur. **Sauf** si on rencontre un guillemet : là, on saute d'un bloc entier via `quoted_len` — c'est ce saut qui fait que les espaces et opérateurs *à l'intérieur* des guillemets ne coupent pas le mot. Le -1 de quoted_len est propagé vers le haut.
+**Branche mot :** on avance tant que le caractère n'est ni fin de chaîne, ni espace, ni opérateur. **Sauf** si on rencontre un guillemet : là, on saute d'un bloc entier via `quoted_len` — c'est ce saut qui fait que les espaces et opérateurs _à l'intérieur_ des guillemets ne coupent pas le mot. Le -1 de quoted_len est propagé vers le haut.
 
 Exemples : `echo hi` → 4 · `"hi there"` → 10 · `"a"b"c"` → 7 (trois segments collés) · `hello|wc` → 5 · `"unclosed` → -1.
 
 ### assign_type — le type d'après le PREMIER caractère
 
-| s[0] | s[1] | Type |
-|------|------|------|
-| `\|` | — | PIPE |
-| `<` | `<` | HEREDOC |
-| `>` | `>` | REDIR_APPEND |
-| `<` | autre | REDIR_IN |
-| `>` | autre | REDIR_OUT |
-| autre (y compris `"`, `'`, `$`) | — | WORD |
+| s[0]                            | s[1]  | Type         |
+| ------------------------------- | ----- | ------------ |
+| `\|`                            | —     | PIPE         |
+| `<`                             | `<`   | HEREDOC      |
+| `>`                             | `>`   | REDIR_APPEND |
+| `<`                             | autre | REDIR_IN     |
+| `>`                             | autre | REDIR_OUT    |
+| autre (y compris `"`, `'`, `$`) | —     | WORD         |
 
 Conséquence élégante : `echo "|"` → le token commence par `"` → **WORD**. Le pipe entre guillemets n'est jamais un opérateur, sans aucun code supplémentaire.
 
@@ -894,12 +910,12 @@ Quatre étapes : longueur (`get_token_len`) → copie (`extract_quoted`) → typ
 
 ### tokenize_line — la boucle maîtresse
 
-Le patron classique du lexing : *sauter les séparateurs → traiter un token → recommencer*. Deux sorties NULL bien distinctes :
+Le patron classique du lexing : _sauter les séparateurs → traiter un token → recommencer_. Deux sorties NULL bien distinctes :
 
-| Situation | Retour | `*err` | Message |
-|-----------|--------|--------|---------|
-| guillemet non fermé / échec malloc | NULL | 2 | `unclosed quote` sur stderr |
-| ligne vide ou espaces seulement | NULL | 0 | rien (pas une erreur !) |
+| Situation                          | Retour | `*err` | Message                     |
+| ---------------------------------- | ------ | ------ | --------------------------- |
+| guillemet non fermé / échec malloc | NULL   | 2      | `unclosed quote` sur stderr |
+| ligne vide ou espaces seulement    | NULL   | 0      | rien (pas une erreur !)     |
 
 > ⚠️ C'est pour distinguer ces deux cas que le paramètre out `int *err` existe. Dans `run_line` : `if (!tokens) return (err ? err : status);`
 
@@ -908,18 +924,21 @@ En cas d'erreur au milieu, `free_token_list(list.head)` libère les tokens déj�
 ## Tests
 
 **T4.1 — Mots simples.**
+
 ```
 minishell$ echo hello world
 [WORD: 'echo'] [WORD: 'hello'] [WORD: 'world']
 ```
 
 **T4.2 — Les guillemets collent (et sont conservés !).**
+
 ```
 minishell$ echo "hi there"
 [WORD: 'echo'] [WORD: '"hi there"']
 ```
 
 **T4.3 — Opérateurs, avec ou sans espaces.**
+
 ```
 minishell$ ls -l|wc
 [WORD: 'ls'] [WORD: '-l'] [PIPE: '|'] [WORD: 'wc']
@@ -928,30 +947,35 @@ minishell$ cat < in >> out
 ```
 
 **T4.4 — Heredoc collé.**
+
 ```
 minishell$ cat <<EOF
 [WORD: 'cat'] [HEREDOC: '<<'] [WORD: 'EOF']
 ```
 
 **T4.5 — Opérateur entre guillemets = WORD.**
+
 ```
 minishell$ echo "|"
 [WORD: 'echo'] [WORD: '"|"']
 ```
 
 **T4.6 — Guillemet non fermé.**
+
 ```
 minishell$ echo 'hello
 minishell: syntax error: unclosed quote      # $? interne = 2
 ```
 
 **T4.7 — Segments collés.**
+
 ```
 minishell$ echo "a"b"c"
 [WORD: 'echo'] [WORD: '"a"b"c"']             # UN seul token
 ```
 
 **T4.8 — Le `$` n'est PAS développé.**
+
 ```
 minishell$ echo $USER
 [WORD: 'echo'] [WORD: '$USER']
@@ -967,7 +991,7 @@ minishell$ echo $USER
 
 ## Objectif
 
-`syntax_ok` retourne 0 sur une séquence cassée, affiche `` minishell: syntax error near unexpected token `X' `` et met `$? = 2`.
+`syntax_ok` retourne 0 sur une séquence cassée, affiche ``minishell: syntax error near unexpected token `X'`` et met `$? = 2`.
 
 ## Pourquoi une vérification séparée ?
 
@@ -1005,7 +1029,7 @@ int	syntax_err(const char *tok, int *error_code);
 ```c
 #include "minishell.h"
 
-static int	is_redir(t_token_type t)
+static int	is_redir_tok(t_token_type t)
 {
 	return (t == REDIR_IN || t == REDIR_OUT
 		|| t == REDIR_APPEND || t == HEREDOC);
@@ -1031,7 +1055,7 @@ int	syntax_ok(t_token *t, int *error_code)
 	{
 		if (t->type == PIPE && (!t->next || t->next->type == PIPE))
 			return (syntax_err("|", error_code));
-		if (is_redir(t->type) && (!t->next || t->next->type != WORD))
+		if (is_redir_tok(t->type) && (!t->next || t->next->type != WORD))
 			return (syntax_err(
 					t->next ? t->next->value : "newline", error_code));
 		t = t->next;
@@ -1072,14 +1096,14 @@ if (t->type == PIPE && (!t->next || t->next->type == PIPE))
 **Vérification n°3 — redirection sans cible :**
 
 ```c
-if (is_redir(t->type) && (!t->next || t->next->type != WORD))
+if (is_redir_tok(t->type) && (!t->next || t->next->type != WORD))
 	return (syntax_err(t->next ? t->next->value : "newline", error_code));
 ```
 
 Après `<`, `>`, `>>`, `<<`, un **WORD est obligatoire** (nom de fichier ou délimiteur heredoc). Le ternaire reproduit le format bash :
 
-- `cat <` → pas de suivant → `` ...token `newline' `` (c'est le mot que bash utilise pour la fin de ligne)
-- `cat < |` → le suivant existe et c'est `|` → `` ...token `|' ``
+- `cat <` → pas de suivant → ``...token `newline'`` (c'est le mot que bash utilise pour la fin de ligne)
+- `cat < |` → le suivant existe et c'est `|` → ``...token `|'``
 
 ## Pourquoi ces trois vérifications suffisent
 
@@ -1111,11 +1135,12 @@ static int	run_line(char *line, t_var *env, int status)
 }
 ```
 
-> ⚠️ `free_token_list(tokens)` **avant** le retour d'erreur : les tokens sont déjà construits, il faut les libérer. Toujours le même pattern : *ça casse → on nettoie derrière soi*.
+> ⚠️ `free_token_list(tokens)` **avant** le retour d'erreur : les tokens sont déjà construits, il faut les libérer. Toujours le même pattern : _ça casse → on nettoie derrière soi_.
 
 ## Tests
 
 **T5.1 — Pipe au début / à la fin / doublé.**
+
 ```
 minishell$ | ls
 minishell: syntax error near unexpected token `|'
@@ -1126,6 +1151,7 @@ minishell: syntax error near unexpected token `|'
 ```
 
 **T5.2 — Redirection sans cible.**
+
 ```
 minishell$ ls >
 minishell: syntax error near unexpected token `newline'
@@ -1136,6 +1162,7 @@ minishell: syntax error near unexpected token `>'
 ```
 
 **T5.3 — Le valide passe.**
+
 ```
 minishell$ ls -l | grep foo > out
 [WORD: 'ls'] [WORD: '-l'] [PIPE: '|'] [WORD: 'grep'] ...
@@ -1166,17 +1193,17 @@ liste t_token  ──✗── NULL + err=2 (unclosed quote)
 
 ## Propriété mémoire — récapitulatif
 
-| Objet | Créé par | Libéré par | Quand |
-|-------|----------|------------|-------|
-| `line` | readline | main | fin de chaque itération |
-| liste `t_var` | create_env | ft_free_env | sortie du shell |
+| Objet           | Créé par      | Libéré par                 | Quand                     |
+| --------------- | ------------- | -------------------------- | ------------------------- |
+| `line`          | readline      | main                       | fin de chaque itération   |
+| liste `t_var`   | create_env    | ft_free_env                | sortie du shell           |
 | liste `t_token` | tokenize_line | run_line → free_token_list | après usage ou sur erreur |
-| historique | add_history | rl_clear_history | sortie du shell |
+| historique      | add_history   | rl_clear_history           | sortie du shell           |
 
 ## Codes de retour — cumulés
 
-| Code | Signification | Introduit en |
-|------|---------------|--------------|
-| 0 | succès | Phase 0 |
-| 2 | erreur de syntaxe | Phases 4–5 |
-| 130 | interrompu par Ctrl-C (128 + 2) | Phase 2 |
+| Code | Signification                   | Introduit en |
+| ---- | ------------------------------- | ------------ |
+| 0    | succès                          | Phase 0      |
+| 2    | erreur de syntaxe               | Phases 4–5   |
+| 130  | interrompu par Ctrl-C (128 + 2) | Phase 2      |

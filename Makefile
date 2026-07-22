@@ -10,15 +10,18 @@ LDLIBS   := -L$(READLINE_PREFIX)/lib -lreadline -Llibft -lft
 SRCS       := \
 	srcs/main.c \
 	srcs/signals.c \
-	srcs/env/env_init.c \
 	srcs/free.c \
-	srcs/debug.c \
+	srcs/error.c \
+	srcs/env/env_init.c \
 	srcs/env/env_get.c \
 	srcs/env/env_set.c \
-	srcs/error.c \
 	srcs/lexer/lexer.c \
 	srcs/lexer/token.c \
-	srcs/parser/syntax.c
+	srcs/parser/syntax.c \
+	srcs/parser/parser.c \
+	srcs/parser/redir_parse.c \
+	srcs/expand/expand.c \
+	srcs/debug.c
 
 OBJS       := $(SRCS:.c=.o)
 DEPS       := $(OBJS:.o=.d)

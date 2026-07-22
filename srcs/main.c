@@ -14,16 +14,20 @@ void	rl_replace_line(const char *text, int clear_undo);
 static int	run_line(char *line, t_var *env, int status)
 {
 	t_token	*tokens;
+	t_node	*tree;
 	int		err;
 
-	(void)env;
 	tokens = tokenize_line(line, &err);
 	if (!tokens)
 		return (status);
 	if (!syntax_ok(tokens, &err))
 		return (free_token_list(tokens), err);
-	print_tokens(tokens);
+	tree = parsing(tokens, env, status, &err);
 	free_token_list(tokens);
+	if (!tree)
+		return (err ? err : status);
+	print_tree(tree, 0);            /* test */
+	ft_free_node(tree);
 	return (status);
 }
 

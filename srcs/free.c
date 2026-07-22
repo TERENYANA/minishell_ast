@@ -29,3 +29,35 @@ void	ft_free_env(t_var *env)
 	}
 }
 
+void	ft_free_redirs(t_redirect *r)
+{
+	t_redirect	*next;
+
+	while (r)
+	{
+		next = r->next;
+		if (r->type == HEREDOC && r->heredoc_fd >= 0)
+			close(r->heredoc_fd);
+		free(r->target);
+		free(r);
+		r = next;
+	}
+}
+
+void	ft_free_node(t_node *node)
+{
+	if (!node)
+		return ;
+	if (node->type == N_CMD)
+	{
+		ft_free_tab(node->cmd);
+		ft_free_redirs(node->redirect);
+	}
+	else
+	{
+		ft_free_node(node->left);
+		ft_free_node(node->right);
+	}
+	free(node);
+}
+
