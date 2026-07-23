@@ -1,4 +1,4 @@
-#include "minishell.h"
+#include "../minishell.h"
 
 /* ** volatile: Prevents the compiler from caching the variable in CPU registers.
 ** sig_atomic_t: Guarantees that read/write operations on this variable are atomic

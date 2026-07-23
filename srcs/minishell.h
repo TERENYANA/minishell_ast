@@ -204,4 +204,30 @@ void print_env(t_var *e);
 void print_tokens(t_token *h);
 void print_tree(t_node *n, int d);
 
+/* ************************************************************************** */
+/*                                  BUILTINS                                  */
+/* ************************************************************************** */
+
+int		is_builtin(char *cmd_name);
+int		dispatch_builtin(char **args, t_var **env_list, int last_status);
+int		ft_cd(char **args, t_var **env_list);
+int		ft_echo(char **args);
+int		ft_env(t_var *env);
+int		ft_exit(char **args, t_var **env, int last_status);
+int		ft_export(char **args, t_var **env_list);
+int		ft_pwd(char **args);
+int		ft_unset(char **args, t_var **env_list);
+
+/* ft_export_utils */
+int		valid_name(char *str);
+void	err_export(char *name);
+int		parse_export_arg(char *arg, char **name, char **value);
+int		check_option(char *arg, int *end_opt);
+
+/* ************************************************************************** */
+/*                                   HEREDOC                                  */
+/* ************************************************************************** */
+int		process_all_heredocs(t_node *node, t_var *env, int status);
+
+
 #endif

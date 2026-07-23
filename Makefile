@@ -9,9 +9,9 @@ LDLIBS   := -L$(READLINE_PREFIX)/lib -lreadline -Llibft -lft
 
 SRCS       := \
 	srcs/main.c \
-	srcs/signals.c \
-	srcs/free.c \
-	srcs/error.c \
+	srcs/utils/signals.c \
+	srcs/utils/free.c \
+	srcs/utils/error.c \
 	srcs/env/env_init.c \
 	srcs/env/env_get.c \
 	srcs/env/env_set.c \
@@ -21,7 +21,18 @@ SRCS       := \
 	srcs/parser/parser.c \
 	srcs/parser/redir_parse.c \
 	srcs/expand/expand.c \
-	srcs/debug.c
+	srcs/expand/expend_hd.c \
+	srcs/builtins/builtins.c \
+	srcs/builtins/ft_cd.c \
+	srcs/builtins/ft_echo.c \
+	srcs/builtins/ft_env.c \
+	srcs/builtins/ft_exit.c \
+	srcs/builtins/ft_export.c \
+	srcs/builtins/ft_export_utils.c \
+	srcs/builtins/ft_pwd.c \
+	srcs/builtins/ft_unset.c \
+	srcs/exec/heredoc.c \
+	srcs/utils/debug.c
 
 OBJS       := $(SRCS:.c=.o)
 DEPS       := $(OBJS:.o=.d)
