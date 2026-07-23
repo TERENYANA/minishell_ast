@@ -16,10 +16,12 @@ SRCS       := \
 	srcs/env/env_get.c \
 	srcs/env/env_set.c \
 	srcs/lexer/lexer.c \
+	srcs/lexer/lexer_utils.c \
 	srcs/lexer/token.c \
+	srcs/lexer/token_utils.c \
 	srcs/parser/syntax.c \
 	srcs/parser/parser.c \
-	srcs/parser/redir_parse.c \
+	srcs/parser/parser_redir.c \
 	srcs/expand/expand.c \
 	srcs/expand/expend_hd.c \
 	srcs/builtins/builtins.c \
@@ -32,7 +34,12 @@ SRCS       := \
 	srcs/builtins/ft_pwd.c \
 	srcs/builtins/ft_unset.c \
 	srcs/exec/heredoc.c \
-	srcs/utils/debug.c
+	srcs/parser/parser_helpers.c \
+	srcs/parser/parser_sub.c \
+	srcs/parser/syntax_utils.c \
+	srcs/parser/parser_nodes.c \
+	srcs/utils/debug.c \
+	srcs/utils/debug_utils.c
 
 OBJS       := $(SRCS:.c=.o)
 DEPS       := $(OBJS:.o=.d)

@@ -164,7 +164,8 @@ int process_redir(t_node *cmd_node, t_token **cur,
 t_redirect *create_redirect(t_token *op, t_token *target,
 							t_parse_info *info);
 void append_redirect(t_node *cmd_node, t_redirect *r);
-
+t_node *syntax_err_node(t_node *node, t_parse_info *info);
+int add_word(t_node *node, t_token *tok, t_parse_info *info);
 /* ************************************************************************** */
 /*                              PARSER : BONUS                                */
 /* ************************************************************************** */

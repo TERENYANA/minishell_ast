@@ -5,12 +5,6 @@ static int	is_logic(t_token_type t)
 	return (t == PIPE || t == AND_IF || t == OR_IF);
 }
 
-int	is_redir_tok(t_token_type t)
-{
-	return (t == REDIR_IN || t == REDIR_OUT
-		|| t == REDIR_APPEND || t == HEREDOC);
-}
-
 int	syntax_err(const char *tok, int *error_code)
 {
 	ft_putstr_fd("minishell: syntax error near unexpected token `", 2);
