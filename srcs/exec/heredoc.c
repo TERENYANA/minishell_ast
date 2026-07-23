@@ -1,17 +1,5 @@
 #include "../minishell.h"
 
-static int	err_msg_heredoc(char *eof)
-{
-	if (g_sig == SIGINT)
-		return (-1);
-	ft_putstr_fd("minishell: warning: here-document ", 2);
-	ft_putstr_fd("delimited by end-of-file (wanted `", 2);
-	if (eof)
-		ft_putstr_fd(eof, 2);
-	ft_putstr_fd("')\n", 2);
-	return (0);
-}
-
 static int	write_pipe(int fd, char *line, t_redirect *r, t_var *env)
 {
 	char	*expanded;
@@ -39,8 +27,13 @@ static int	hd_line(int p[2], char *line, t_redirect *r, t_var *env)
 {
 	if (!line)
 	{
-		if (err_msg_heredoc(r->target) == -1)
+		if (g_sig == SIGINT)
 			return (-1);
+		ft_putstr_fd("minishell: warning: here-document ", 2);
+		ft_putstr_fd("delimited by end-of-file (wanted `", 2);
+		if (r->target)
+			ft_putstr_fd(r->target, 2);
+		ft_putstr_fd("')\n", 2);
 		return (0);
 	}
 	if (ft_strcmp(line, r->target) == 0)
@@ -50,11 +43,27 @@ static int	hd_line(int p[2], char *line, t_redirect *r, t_var *env)
 	return (1);
 }
 
+static void	heredoc_child(int p[2], t_redirect *redir, t_var *env)
+{
+	char	*line;
+	int		ret;
+
+	close(p[0]);
+	setup_heredoc_signals();
+	while (1)
+	{
+		line = readline("> ");
+		ret = hd_line(p, line, redir, env);
+		if (ret == -1)
+			exit(1);
+		if (ret == 0)
+			exit(0);
+	}
+}
+
 static int	process_heredoc(t_redirect *redir, t_var *env)
 {
 	int		p[2];
-	char	*line;
-	int		ret;
 	pid_t	pid;
 	int		status;
 
@@ -65,19 +74,7 @@ static int	process_heredoc(t_redirect *redir, t_var *env)
 	if (pid == -1)
 		return (close(p[0]), close(p[1]), -1);
 	if (pid == 0)
-	{
-		close(p[0]);
-		setup_heredoc_signals();
-		while (1)
-		{
-			line = readline("> ");
-			ret = hd_line(p, line, redir, env);
-			if (ret == -1)
-				exit(1);
-			if (ret == 0)
-				exit(0);
-		}
-	}
+		heredoc_child(p, redir, env);
 	close(p[1]);
 	waitpid(pid, &status, 0);
 	setup_signal_handlers();
