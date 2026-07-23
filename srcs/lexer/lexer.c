@@ -1,16 +1,5 @@
 #include "../minishell.h"
 
-int	is_special(char c)
-{
-	return (c == '|' || c == '<' || c == '>'
-		|| c == '&' || c == '(' || c == ')');
-}
-
-int	is_whitespace(char c)
-{
-	return (c == ' ' || c == '\t');
-}
-
 /* Longueur de la section entre guillemets, incluant le guillemet fermant. -1 si non fermé. */
 static int	quoted_len(char *s)
 {

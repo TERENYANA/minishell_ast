@@ -120,42 +120,6 @@ t_node *parse_command(t_token **cur, t_parse_info *info)
     return (node);
 }
 
-// GRAMMAIRE : primary (atome / ascenseur)
-
-/* Redirections placees APRES la parenthese fermante : (echo hi) > out */
-static int read_sub_redirs(t_node *sub, t_token **cur, t_parse_info *info)
-{
-    while (*cur && is_redir_tok((*cur)->type))
-    {
-        if (!process_redir(sub, cur, info))
-            return (0);
-    }
-    return (1);
-}
-
-t_node *parse_primary(t_token **cur, t_parse_info *info)
-{
-    t_node *inner;
-    t_node *sub;
-
-    if (!*cur || (*cur)->type != LPAREN)
-        return (parse_command(cur, info));
-    *cur = (*cur)->next;
-    inner = parse_list(cur, info);
-    if (!inner)
-        return (NULL);
-    if (!*cur || (*cur)->type != RPAREN)
-        return (syntax_err_node(inner, info));
-    *cur = (*cur)->next;
-    sub = new_op_node(N_SUB, inner, NULL);
-    if (!sub)
-        return (NULL);
-    if (!read_sub_redirs(sub, cur, info))
-        return (ft_free_node(sub), NULL);
-    return (sub);
-}
-// GRAMMAIRE : pipeline et list
-
 t_node *parse_pipeline(t_token **cur, t_parse_info *info)
 {
     t_node *left;
@@ -177,7 +141,6 @@ t_node *parse_pipeline(t_token **cur, t_parse_info *info)
     return (left);
 }
 
-/* Meme accumulation vers la gauche que pipeline, avec deux operateurs. */
 t_node *parse_list(t_token **cur, t_parse_info *info)
 {
     t_node *left;
@@ -202,8 +165,6 @@ t_node *parse_list(t_token **cur, t_parse_info *info)
     }
     return (left);
 }
-
-// POINT D'ENTREE
 
 t_node *parsing(t_token *head, t_var *env, int status, int *error_code)
 {

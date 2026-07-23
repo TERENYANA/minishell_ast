@@ -1,0 +1,66 @@
+#include "../minishell.h"
+
+int	valid_name(char *str)
+{
+	int	i;
+
+	if (!str || str[0] == '\0')
+		return (-1);
+	if (!ft_isalpha(str[0]) && str[0] != '_')
+		return (-1);
+	i = 1;
+	while (str[i])
+	{
+		if (!ft_isalnum(str[i]) && str[i] != '_')
+			return (-1);
+		i++;
+	}
+	return (0);
+}
+
+void	err_export(char *name)
+{
+	ft_putstr_fd("minishell: export: '", 2);
+	ft_putstr_fd(name, 2);
+	ft_putstr_fd("': not a valid identifier\n", 2);
+}
+
+int	parse_export_arg(char *arg, char **name, char **value)
+{
+	char	*equal_pos;
+
+	if (!arg)
+		return (1);
+	equal_pos = ft_strchr(arg, '=');
+	if (!equal_pos)
+		*name = ft_strdup(arg);
+	else
+		*name = ft_substr(arg, 0, equal_pos - arg);
+	if (!*name)
+		return (1);
+	*value = NULL;
+	if (equal_pos)
+	{
+		*value = ft_strdup(equal_pos + 1);
+		if (!*value)
+			return (free(*name), 1);
+	}
+	return (0);
+}
+
+int	check_option(char *arg, int *end_opt)
+{
+	if (!*end_opt && arg[0] == '-' && arg[1] != '\0')
+	{
+		if (arg[1] == '-' && arg[2] == '\0')
+		{
+			*end_opt = 1;
+			return (1);
+		}
+		ft_putstr_fd("minishell: export: ", 2);
+		write(2, arg, 2);
+		ft_putendl_fd(": invalid option", 2);
+		return (2);
+	}
+	return (0);
+}

@@ -1,4 +1,4 @@
-#include "minishell.h"
+#include "../minishell.h"
 
 /* ** volatile: Prevents the compiler from caching the variable in CPU registers.
 ** sig_atomic_t: Guarantees that read/write operations on this variable are atomic
@@ -57,13 +57,8 @@ void    ignore_signals(void)
 static void on_signal_heredoc(int signo)
 {
     g_sig = signo;
-    /*
-    ** Trick: Close standard input (STDIN). 
-    ** This causes readline()—which is currently waiting for input inside the heredoc—
-    ** to immediately encounter an end-of-file (EOF) state and return NULL.
-    ** This allows the heredoc loop to detect the break and terminate cleanly.
-    */
-    close(STDIN_FILENO);
+    write(STDOUT_FILENO, "\n", 1);
+    exit(130);
 }
 
 /*

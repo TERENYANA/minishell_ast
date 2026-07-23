@@ -1,4 +1,4 @@
-#include "minishell.h"
+#include "../minishell.h"
 
 static int sub_redirs(t_node *sub, t_token **cur, t_parse_info *info)
 {
