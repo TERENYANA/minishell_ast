@@ -39,7 +39,8 @@ static int	hd_line(int p[2], char *line, t_redirect *r, t_var *env)
 {
 	if (!line)
 	{
-		err_msg_heredoc(r->target);
+		if (err_msg_heredoc(r->target) == -1)
+			return (-1);
 		return (0);
 	}
 	if (ft_strcmp(line, r->target) == 0)
@@ -54,21 +55,38 @@ static int	process_heredoc(t_redirect *redir, t_var *env)
 	int		p[2];
 	char	*line;
 	int		ret;
+	pid_t	pid;
+	int		status;
 
 	if (pipe(p) == -1)
 		return (-1);
-	while (1)
+	ignore_signals();
+	pid = fork();
+	if (pid == -1)
+		return (close(p[0]), close(p[1]), -1);
+	if (pid == 0)
 	{
-		if (g_sig)
-			return (close(p[0]), close(p[1]), -1);
-		line = readline("> ");
-		ret = hd_line(p, line, redir, env);
-		if (ret == -1)
-			return (-1);
-		if (ret == 0)
-			break ;
+		close(p[0]);
+		setup_heredoc_signals();
+		while (1)
+		{
+			line = readline("> ");
+			ret = hd_line(p, line, redir, env);
+			if (ret == -1)
+				exit(1);
+			if (ret == 0)
+				exit(0);
+		}
 	}
 	close(p[1]);
+	waitpid(pid, &status, 0);
+	setup_signal_handlers();
+	if (WIFEXITED(status) && WEXITSTATUS(status) == 130)
+	{
+		g_sig = SIGINT;
+		close(p[0]);
+		return (-1);
+	}
 	redir->heredoc_fd = p[0];
 	return (0);
 }
