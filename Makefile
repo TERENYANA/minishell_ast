@@ -21,7 +21,10 @@ SRCS       := \
 	srcs/parser/parser.c \
 	srcs/parser/redir_parse.c \
 	srcs/expand/expand.c \
-	srcs/debug.c
+	srcs/debug.c \
+	srcs/expand/wildcard.c\
+ 	srcs/expand/wildcard_dir.c\
+	srcs/expand/wildcard_apply.c
 
 OBJS       := $(SRCS:.c=.o)
 DEPS       := $(OBJS:.o=.d)

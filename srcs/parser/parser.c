@@ -69,18 +69,7 @@ int add_arg(t_node *node, char *value)
     return (1);
 }
 
-/* Mot vide sans guillemets : on le jette (comportement bash). */
-static int add_word(t_node *node, t_token *tok, t_parse_info *info)
-{
-    char *expanded;
 
-    expanded = ft_expand(tok->value, info->env, info->status);
-    if (!expanded)
-        return (0);
-    if (expanded[0] == '\0' && !has_quotes(tok->value))
-        return (free(expanded), 1);
-    return (add_arg(node, expanded));
-}
 
 int is_cmd_end(t_token *t)
 {
@@ -88,7 +77,24 @@ int is_cmd_end(t_token *t)
         return (1);
     return (t->type == PIPE || t->type == AND_IF || t->type == OR_IF || t->type == RPAREN);
 }
+static int  add_word(t_node *node, t_token *tok, t_parse_info *info)
+{
+    char    *expanded;
 
+    expanded = ft_expand(tok->value, info->env, info->status);
+    if (!expanded)
+        return (0);
+    if (expanded[0] == '\0' && !has_quotes(tok->value))
+        return (free(expanded), 1);
+
+    // 🐛 DEBUG PRINT
+    printf("[DEBUG] tok->value = '%s', has_star = %d\n", 
+           tok->value, has_unquoted_star(tok->value));
+
+    if (has_unquoted_star(tok->value))            /* ← СЫРОЙ токен! */
+        return (add_wildcard_args(node, expanded));
+    return (add_arg(node, expanded));
+}
 // GRAMMAIRE : command (feuilles)
 
 t_node *parse_command(t_token **cur, t_parse_info *info)

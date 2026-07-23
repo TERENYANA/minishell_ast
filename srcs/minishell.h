@@ -204,4 +204,12 @@ void print_env(t_var *e);
 void print_tokens(t_token *h);
 void print_tree(t_node *n, int d);
 
+// Wildcards
+/* Wildcards */
+int		has_unquoted_star(const char *s);
+int		wc_match(const char *pat, const char *s);
+char	**collect_matches(const char *pattern);
+void	sort_tab(char **tab);
+int		tab_push(char ***tab, const char *name);
+int		add_wildcard_args(t_node *node, char *pattern);
 #endif
