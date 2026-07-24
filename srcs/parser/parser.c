@@ -8,31 +8,6 @@
 **   command  := (WORD | redirection)+                feuilles
 */
 
-// CONSTRUCTEURS
-
-t_node *new_cmd_node(void)
-{
-    t_node *n;
-
-    n = ft_calloc(1, sizeof(t_node));
-    if (!n)
-        return (NULL);
-    n->type = N_CMD;
-    return (n);
-}
-
-t_node *new_op_node(t_node_type type, t_node *left, t_node *right)
-{
-    t_node *n;
-
-    n = ft_calloc(1, sizeof(t_node));
-    if (!n)
-        return (ft_free_node(left), ft_free_node(right), NULL);
-    n->type = type;
-    n->left = left;
-    n->right = right;
-    return (n);
-}
 
 // HELPERS
 
@@ -45,38 +20,9 @@ static t_node *syntax_err_node(t_node *node, t_parse_info *info)
     return (NULL);
 }
 
-int add_arg(t_node *node, char *value)
-{
-    char **arr;
-    int i;
-
-    i = 0;
-    while (node->cmd && node->cmd[i])
-        i++;
-    arr = malloc(sizeof(char *) * (i + 2));
-    if (!arr)
-        return (free(value), 0);
-    i = 0;
-    while (node->cmd && node->cmd[i])
-    {
-        arr[i] = node->cmd[i];
-        i++;
-    }
-    arr[i] = value;
-    arr[i + 1] = NULL;
-    free(node->cmd);
-    node->cmd = arr;
-    return (1);
-}
 
 
 
-int is_cmd_end(t_token *t)
-{
-    if (!t)
-        return (1);
-    return (t->type == PIPE || t->type == AND_IF || t->type == OR_IF || t->type == RPAREN);
-}
 static int  add_word(t_node *node, t_token *tok, t_parse_info *info)
 {
     char    *expanded;

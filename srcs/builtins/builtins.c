@@ -12,11 +12,16 @@ int	is_builtin(char *cmd_name)
 	return (0);
 }
 
-int	dispatch_builtin(char **args, t_var **env_list, int last_status)
+int	dispatch_builtin(t_node *node, t_var **env_list, int last_status)
 {
+	char	**args;
 	char	*name;
 
+	if (!node || !node->cmd || !node->cmd[0])
+		return (0);
+	args = node->cmd;
 	name = args[0];
+	
 	if (ft_strcmp(name, ":") == 0)
 		return (0);
 	if (ft_strcmp(name, "echo") == 0)
@@ -32,6 +37,6 @@ int	dispatch_builtin(char **args, t_var **env_list, int last_status)
 	if (ft_strcmp(name, "unset") == 0)
 		return (ft_unset(args, env_list));
 	if (ft_strcmp(name, "exit") == 0)
-		return (ft_exit(args, env_list, last_status));
+		return (ft_exit(node, node, env_list, last_status));
 	return (127);
 }

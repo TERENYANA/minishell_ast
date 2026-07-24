@@ -7,26 +7,9 @@ READLINE_PREFIX := $(shell brew --prefix readline)
 INCLUDES := -I. -Ilibft -I$(READLINE_PREFIX)/include
 LDLIBS   := -L$(READLINE_PREFIX)/lib -lreadline -Llibft -lft
 
-SRCS       := \
-	srcs/main.c \
-	srcs/utils/signals.c \
-	srcs/utils/free.c \
-	srcs/utils/error.c \
-	srcs/env/env_init.c \
-	srcs/env/env_get.c \
-	srcs/env/env_set.c \
-	srcs/lexer/lexer.c \
-	srcs/lexer/lexer_utils.c \
-	srcs/lexer/token.c \
-	srcs/lexer/token_utils.c \
-	srcs/parser/syntax.c \
-	srcs/parser/parser.c \
-	srcs/parser/parser_redir.c \
-	srcs/expand/expand.c \
-	srcs/debug.c \
-	srcs/expand/wildcard.c\
- 	srcs/expand/wildcard_dir.c\
-	srcs/expand/wildcard_apply.c
+SRCS        = $(shell find srcs -type f -name "*.c")
+
+
 
 OBJS       := $(SRCS:.c=.o)
 DEPS       := $(OBJS:.o=.d)

@@ -164,8 +164,6 @@ int process_redir(t_node *cmd_node, t_token **cur,
 t_redirect *create_redirect(t_token *op, t_token *target,
 							t_parse_info *info);
 void append_redirect(t_node *cmd_node, t_redirect *r);
-t_node *syntax_err_node(t_node *node, t_parse_info *info);
-int add_word(t_node *node, t_token *tok, t_parse_info *info);
 /* ************************************************************************** */
 /*                              PARSER : BONUS                                */
 /* ************************************************************************** */
@@ -195,16 +193,15 @@ void ft_free_redirs(t_redirect *r);
 /*                                  UTILS                                     */
 /* ************************************************************************** */
 
+int	ft_strcmp(const char *a, const char *b);
+int	err_msg(const char *prefix, const char *msg, int code);
 int ft_strcmp(const char *a, const char *b);
-
-/* ************************************************************************** */
-/*                        DEBUG — a supprimer avant rendu                     */
-/* ************************************************************************** */
-
-void print_env(t_var *e);
-void print_tokens(t_token *h);
-void print_tree(t_node *n, int d);
-
+void	cleanup_and_exit(t_node *root, t_var **env, int code);
+int	err_msg(const char *prefix, const char *msg, int code);
+int	valid_name(char *str);
+void	err_export(char *name);
+int	parse_export_arg(char *arg, char **name, char **value);
+int	check_option(char *arg, int *end_opt);
 // Wildcards
 /* Wildcards */
 int		has_unquoted_star(const char *s);
@@ -213,4 +210,25 @@ char	**collect_matches(const char *pattern);
 void	sort_tab(char **tab);
 int		tab_push(char ***tab, const char *name);
 int		add_wildcard_args(t_node *node, char *pattern);
+
+//exec
+
+int		run_tree(t_node *root, t_var **env, int last_status);
+void	exec_node_in_child(t_node *root, t_node *cur, t_var **env);
+void	exec_external_cmd(t_node *root, t_node *cur, t_var **env);
+char	*find_cmd_path(char *cmd, t_var *env);
+int		handle_child_status(int wstatus);
+
+//builtins
+/* Built-in commands */
+int	is_builtin(char *cmd_name);
+int	dispatch_builtin(t_node *node, t_var **env_list, int last_status);
+int	ft_echo(char **args);
+int	ft_pwd(char **args);
+int	ft_env(t_var *env);
+int	ft_export(char **args, t_var **env_list);
+int	ft_cd(char **args, t_var **env_list);
+int	ft_unset(char **args, t_var **env_list);
+int	ft_exit(t_node *root, t_node *cur, t_var **env, int last_status);
+
 #endif

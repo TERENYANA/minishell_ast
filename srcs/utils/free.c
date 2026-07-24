@@ -61,3 +61,11 @@ void	ft_free_node(t_node *node)
 	free(node);
 }
 
+void	cleanup_and_exit(t_node *root, t_var **env, int code)
+{
+	ft_free_node(root);
+	if (env && *env)
+		ft_free_env(*env);
+	rl_clear_history();
+	exit(code);
+}
