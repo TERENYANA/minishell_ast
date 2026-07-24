@@ -1,14 +1,17 @@
 #include "../minishell.h"
 
-static int	write_pipe(int fd, char *line, t_redirect *r, t_var *env)
+static int	write_pipe(int fd, char *line, t_redirect *r, t_var *env, int status)
 {
 	char	*expanded;
 
 	if (r->expand_heredoc)
 	{
-		expanded = expand_heredoc_line(line, env);
+		expanded = expand_heredoc_line(line, env, status);
 		if (!expanded)
+		{
+			free(line);
 			return (-1);
+		}
 		write(fd, expanded, ft_strlen(expanded));
 		write(fd, "\n", 1);
 		free(expanded);
@@ -23,27 +26,24 @@ static int	write_pipe(int fd, char *line, t_redirect *r, t_var *env)
 	return (0);
 }
 
-static int	hd_line(int p[2], char *line, t_redirect *r, t_var *env)
+static int	hd_line(int p[2], char *line, t_redirect *r, t_var *env, int status)
 {
 	if (!line)
+		return (0);
+	if (ft_strcmp(line, r->target) == 0)
 	{
-		if (g_sig == SIGINT)
-			return (-1);
-		ft_putstr_fd("minishell: warning: here-document ", 2);
-		ft_putstr_fd("delimited by end-of-file (wanted `", 2);
-		if (r->target)
-			ft_putstr_fd(r->target, 2);
-		ft_putstr_fd("')\n", 2);
+		free(line);
 		return (0);
 	}
-	if (ft_strcmp(line, r->target) == 0)
-		return (free(line), 0);
-	if (write_pipe(p[1], line, r, env) == -1)
-		return (close(p[0]), close(p[1]), -1);
+	if (write_pipe(p[1], line, r, env, status) == -1)
+	{
+		close(p[1]);
+		return (-1);
+	}
 	return (1);
 }
 
-static void	heredoc_child(int p[2], t_redirect *redir, t_var *env)
+static void	heredoc_child(int p[2], t_redirect *redir, t_var *env, int status)
 {
 	char	*line;
 	int		ret;
@@ -52,16 +52,22 @@ static void	heredoc_child(int p[2], t_redirect *redir, t_var *env)
 	setup_heredoc_signals();
 	while (1)
 	{
-		line = readline("> ");
-		ret = hd_line(p, line, redir, env);
-		if (ret == -1)
-			exit(1);
-		if (ret == 0)
+		if (isatty(STDIN_FILENO))
+			line = readline("> ");
+		else
+			line = get_next_line(STDIN_FILENO);
+		ret = hd_line(p, line, redir, env, status);
+		if (ret <= 0)
+		{
+			close(p[1]);
+			if (ret == -1)
+				exit(1);
 			exit(0);
+		}
 	}
 }
 
-static int	process_heredoc(t_redirect *redir, t_var *env)
+static int	process_heredoc(t_redirect *redir, t_var *env, int status_val)
 {
 	int		p[2];
 	pid_t	pid;
@@ -74,11 +80,12 @@ static int	process_heredoc(t_redirect *redir, t_var *env)
 	if (pid == -1)
 		return (close(p[0]), close(p[1]), -1);
 	if (pid == 0)
-		heredoc_child(p, redir, env);
+		heredoc_child(p, redir, env, status_val);
 	close(p[1]);
 	waitpid(pid, &status, 0);
 	setup_signal_handlers();
-	if (WIFEXITED(status) && WEXITSTATUS(status) == 130)
+	if ((WIFSIGNALED(status) && WTERMSIG(status) == SIGINT)
+		|| (WIFEXITED(status) && WEXITSTATUS(status) == 130))
 	{
 		g_sig = SIGINT;
 		close(p[0]);
@@ -92,7 +99,6 @@ int	process_all_heredocs(t_node *node, t_var *env, int status)
 {
 	t_redirect	*r;
 
-	(void)status;
 	if (!node)
 		return (0);
 	if (node->type == N_CMD)
@@ -100,7 +106,7 @@ int	process_all_heredocs(t_node *node, t_var *env, int status)
 		r = node->redirect;
 		while (r)
 		{
-			if (r->type == HEREDOC && process_heredoc(r, env) == -1)
+			if (r->type == HEREDOC && process_heredoc(r, env, status) == -1)
 				return (-1);
 			r = r->next;
 		}

@@ -1,4 +1,3 @@
-
 #include "../minishell.h"
 
 static char	*hd_append(char *res, char c)
@@ -24,21 +23,35 @@ static char	*hd_join_free(char *a, char *b)
 	char	*res;
 
 	if (!a || !b)
-		return (free(a), free(b), NULL);
+	{
+		if (a)
+			free(a);
+		if (b)
+			free(b);
+		return (NULL);
+	}
 	res = ft_strjoin(a, b);
 	free(a);
 	free(b);
 	return (res);
 }
 
-static char	*hd_dollar(char *s, int *i, t_var *env)
+static char	*hd_dollar(char *s, int *i, t_var *env, int status)
 {
 	int		start;
 	char	*name;
 	char	*val;
 
+	if (s[*i + 1] == '?')
+	{
+		*i += 2;
+		return (ft_itoa(status));
+	}
 	if (!s[*i + 1] || (!ft_isalpha(s[*i + 1]) && s[*i + 1] != '_'))
-		return ((*i)++, ft_strdup("$"));
+	{
+		(*i)++;
+		return (ft_strdup("$"));
+	}
 	start = ++(*i);
 	while (s[*i] && (ft_isalnum(s[*i]) || s[*i] == '_'))
 		(*i)++;
@@ -50,7 +63,7 @@ static char	*hd_dollar(char *s, int *i, t_var *env)
 	return (ft_strdup(val ? val : ""));
 }
 
-char	*expand_heredoc_line(char *s, t_var *env)
+char	*expand_heredoc_line(char *s, t_var *env, int status)
 {
 	char	*res;
 	int		i;
@@ -62,7 +75,7 @@ char	*expand_heredoc_line(char *s, t_var *env)
 	while (res && s[i])
 	{
 		if (s[i] == '$')
-			res = hd_join_free(res, hd_dollar(s, &i, env));
+			res = hd_join_free(res, hd_dollar(s, &i, env, status));
 		else
 			res = hd_append(res, s[i++]);
 	}

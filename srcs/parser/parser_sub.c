@@ -10,25 +10,36 @@ static int sub_redirs(t_node *sub, t_token **cur, t_parse_info *info)
     return (1);
 }
 
-/* primary := '(' list ')' redir*  |  command */
 t_node *parse_primary(t_token **cur, t_parse_info *info)
 {
     t_node *inner;
     t_node *sub;
 
-    if (!*cur || (*cur)->type != LPAREN)
+    if (!*cur)
+        return (NULL);
+    if ((*cur)->type != LPAREN)
         return (parse_command(cur, info));
     *cur = (*cur)->next;
-    inner = parse_list(cur, info); /* ЛИФТ: снова верхний этаж */
+    inner = parse_list(cur, info);
     if (!inner)
         return (NULL);
     if (!*cur || (*cur)->type != RPAREN)
-        return (ft_free_node(inner), syntax_err(")", info->error_code), NULL);
+    {
+        ft_free_node(inner);
+        syntax_err(*cur ? (*cur)->value : "newline", info->error_code);
+        return (NULL);
+    }
     *cur = (*cur)->next;
     sub = new_op_node(N_SUB, inner, NULL);
     if (!sub)
+    {
+        ft_free_node(inner);
         return (NULL);
+    }
     if (!sub_redirs(sub, cur, info))
-        return (ft_free_node(sub), NULL);
+    {
+        ft_free_node(sub);
+        return (NULL);
+    }
     return (sub);
 }

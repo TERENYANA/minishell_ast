@@ -49,15 +49,13 @@ void	ft_free_node(t_node *node)
 	if (!node)
 		return ;
 	if (node->type == N_CMD)
-	{
 		ft_free_tab(node->cmd);
-		ft_free_redirs(node->redirect);
-	}
 	else
 	{
 		ft_free_node(node->left);
 		ft_free_node(node->right);
 	}
+	ft_free_redirs(node->redirect);
 	free(node);
 }
 

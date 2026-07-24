@@ -58,7 +58,7 @@ int	check_option(char *arg, int *end_opt)
 			return (1);
 		}
 		ft_putstr_fd("minishell: export: ", 2);
-		write(2, arg, 2);
+		ft_putstr_fd(arg, 2);
 		ft_putendl_fd(": invalid option", 2);
 		return (2);
 	}

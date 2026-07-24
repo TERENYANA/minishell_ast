@@ -30,6 +30,14 @@ static int	run_builtin_in_parent(t_node *node, t_var **env, int last_status)
 
 	saved_in = dup(STDIN_FILENO);
 	saved_out = dup(STDOUT_FILENO);
+	if (saved_in < 0 || saved_out < 0)
+	{
+		if (saved_in >= 0)
+			close(saved_in);
+		if (saved_out >= 0)
+			close(saved_out);
+		return (1);
+	}
 	if (apply_redirections(node) != 0)
 		ret = 1;
 	else if (!node->cmd || !node->cmd[0])

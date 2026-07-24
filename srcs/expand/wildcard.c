@@ -1,6 +1,5 @@
 #include "../minishell.h"
 
-/* Есть ли '*' ВНЕ кавычек в сыром токене? */
 int	has_unquoted_star(const char *s)
 {
 	int		i;
@@ -21,16 +20,21 @@ int	has_unquoted_star(const char *s)
 	return (0);
 }
 
-/* Сопоставление: '*' = любая (в т.ч. пустая) последовательность. */
+/*
+** ИСПРАВЛЕНО: Сворачивание идущих подряд звёздочек ('**' -> '*').
+** Это предотвращает глубокую рекурсию и падение по Segfault.
+*/
 int	wc_match(const char *pat, const char *s)
 {
+	while (*pat == '*' && *(pat + 1) == '*')
+		pat++;
 	if (!*pat)
 		return (!*s);
 	if (*pat == '*')
 	{
-		if (wc_match(pat + 1, s))          /* '*' взяла ноль символов */
+		if (wc_match(pat + 1, s))
 			return (1);
-		if (*s && wc_match(pat, s + 1))    /* '*' съедает ещё один    */
+		if (*s && wc_match(pat, s + 1))
 			return (1);
 		return (0);
 	}

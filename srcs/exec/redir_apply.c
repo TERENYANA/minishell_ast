@@ -2,6 +2,8 @@
 
 static int	open_redir(t_redirect *r)
 {
+	if (!r)
+		return (-1);
 	if (r->type == HEREDOC)
 		return (r->heredoc_fd);
 	if (r->type == REDIR_IN)
@@ -14,7 +16,10 @@ static int	open_redir(t_redirect *r)
 static int	perror_redir(const char *target)
 {
 	ft_putstr_fd("minishell: ", 2);
-	perror((char *)target);
+	if (target)
+		perror((char *)target);
+	else
+		ft_putendl_fd("ambiguous redirect", 2);
 	return (1);
 }
 
@@ -23,6 +28,8 @@ int	apply_redirections(t_node *cmd_node)
 	t_redirect	*r;
 	int			fd;
 
+	if (!cmd_node)
+		return (0);
 	r = cmd_node->redirect;
 	while (r)
 	{
@@ -33,8 +40,10 @@ int	apply_redirections(t_node *cmd_node)
 			dup2(fd, STDIN_FILENO);
 		else
 			dup2(fd, STDOUT_FILENO);
-		if (r->type != HEREDOC)
-			close(fd);
+		close(fd);
+		/* Если это heredoc, сбрасываем fd, чтобы не было дублей */
+		if (r->type == HEREDOC)
+			r->heredoc_fd = -1;
 		r = r->next;
 	}
 	return (0);

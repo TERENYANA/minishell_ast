@@ -2,17 +2,19 @@ NAME       := minishell
 
 CC         := cc
 CFLAGS     := -Wall -Wextra -Werror
-READLINE_PREFIX := $(shell brew --prefix readline)
 
-INCLUDES := -I. -Ilibft -I$(READLINE_PREFIX)/include
-LDLIBS   := -L$(READLINE_PREFIX)/lib -lreadline -Llibft -lft
+UNAME_S    := $(shell uname -s)
 
-SRCS        = $(shell find srcs -type f -name "*.c")
+ifeq ($(UNAME_S),Darwin)
+	READLINE_PREFIX := $(shell brew --prefix readline)
+	INCLUDES := -I. -Ilibft -I$(READLINE_PREFIX)/include
+	LDLIBS   := -L$(READLINE_PREFIX)/lib -lreadline -Llibft -lft
+else
+	INCLUDES := -I. -Ilibft
+	LDLIBS   := -lreadline -Llibft -lft
+endif
 
-
-
-OBJS       := $(SRCS:.c=.o)
-DEPS       := $(OBJS:.o=.d)
+SRCS       = $(shell find srcs -type f -name "*.c")
 
 OBJS       := $(SRCS:.c=.o)
 DEPS       := $(OBJS:.o=.d)

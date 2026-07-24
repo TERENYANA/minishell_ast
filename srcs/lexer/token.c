@@ -28,11 +28,17 @@ bool	add_token(char *value, t_token_type type, t_tok_list *list)
 	return (true);
 }
 
+/*
+** ИСПРАВЛЕНО: Если токен начинается с кавычки, это ВСЕГДА обычное слово (WORD),
+** даже если внутри находится '|', '&&', '>' и т.д.
+*/
 t_token_type	assign_type(const char *s)
 {
+	if (s[0] == '\'' || s[0] == '"')
+		return (WORD);
 	if (s[0] == '&' && s[1] == '&')
 		return (AND_IF);
-	if (s[0] == '|' && s[1] == '|')      /* ДО одиночного '|' ! */
+	if (s[0] == '|' && s[1] == '|')
 		return (OR_IF);
 	if (s[0] == '|')
 		return (PIPE);
@@ -62,4 +68,3 @@ char	*extract_quoted(char *s, int len)
 	res[len] = '\0';
 	return (res);
 }
-

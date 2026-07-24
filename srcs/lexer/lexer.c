@@ -1,6 +1,5 @@
 #include "../minishell.h"
 
-/* Longueur de la section entre guillemets, incluant le guillemet fermant. -1 si non fermé. */
 static int	quoted_len(char *s)
 {
 	char	q;

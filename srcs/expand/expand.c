@@ -32,6 +32,12 @@ static char	*join_free(char *a, char *b)
 	return (res);
 }
 
+/*
+** ИСПРАВЛЕНО:
+** 1. Обработка $? (возврат exit status).
+** 2. Обработка $1..$9 (съедает цифру и возвращает пустую строку, т.к. позиционных аргументов в minishell нет).
+** 3. Обработка одиночного $ или $ перед кавычками/пробелами.
+*/
 static char	*expand_dollar(char *s, int *i, t_var *env, int status)
 {
 	int		start;
@@ -40,6 +46,8 @@ static char	*expand_dollar(char *s, int *i, t_var *env, int status)
 
 	if (s[*i + 1] == '?')
 		return (*i += 2, ft_itoa(status));
+	if (ft_isdigit(s[*i + 1]))
+		return (*i += 2, ft_strdup(""));
 	if (!s[*i + 1] || (!ft_isalpha(s[*i + 1]) && s[*i + 1] != '_'))
 		return ((*i)++, ft_strdup("$"));
 	start = ++(*i);

@@ -1,15 +1,71 @@
 #include "../minishell.h"
 
-static int	print_export(t_var *env)
+static int	count_vars(t_var *env)
 {
+	int	n;
+
+	n = 0;
 	while (env)
 	{
-		if (env->value)
-			printf("declare -x %s=\"%s\"\n", env->name, env->value);
-		else
-			printf("declare -x %s\n", env->name);
+		n++;
 		env = env->next;
 	}
+	return (n);
+}
+
+static void	sort_ptrs(t_var **arr, int n)
+{
+	int		i;
+	int		j;
+	t_var	*tmp;
+
+	i = 0;
+	while (i < n - 1)
+	{
+		j = 0;
+		while (j < n - 1 - i)
+		{
+			if (ft_strcmp(arr[j]->name, arr[j + 1]->name) > 0)
+			{
+				tmp = arr[j];
+				arr[j] = arr[j + 1];
+				arr[j + 1] = tmp;
+			}
+			j++;
+		}
+		i++;
+	}
+}
+
+static int	print_export(t_var *env)
+{
+	t_var	**arr;
+	int		n;
+	int		i;
+
+	n = count_vars(env);
+	if (n == 0)
+		return (0);
+	arr = malloc(sizeof(t_var *) * n);
+	if (!arr)
+		return (1);
+	i = 0;
+	while (env)
+	{
+		arr[i++] = env;
+		env = env->next;
+	}
+	sort_ptrs(arr, n);
+	i = 0;
+	while (i < n)
+	{
+		if (arr[i]->value)
+			printf("declare -x %s=\"%s\"\n", arr[i]->name, arr[i]->value);
+		else
+			printf("declare -x %s\n", arr[i]->name);
+		i++;
+	}
+	free(arr);
 	return (0);
 }
 
@@ -49,7 +105,12 @@ int	ft_export(char **args, t_var **env_list)
 		ret = check_option(args[i], &end_opt);
 		if (ret == 2)
 			return (2);
-		if (ret == 0 && handle_export_arg(args[i], env_list))
+		if (ret == 1)
+		{
+			i++;
+			continue ;
+		}
+		if (handle_export_arg(args[i], env_list))
 			error = 1;
 		i++;
 	}
