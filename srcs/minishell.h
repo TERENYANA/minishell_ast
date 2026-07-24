@@ -218,6 +218,7 @@ void	exec_node_in_child(t_node *root, t_node *cur, t_var **env);
 void	exec_external_cmd(t_node *root, t_node *cur, t_var **env);
 char	*find_cmd_path(char *cmd, t_var *env);
 int		handle_child_status(int wstatus);
+void	exec_pipe_in_child(t_node *root, t_node *cur, t_var **env);
 
 //builtins
 /* Built-in commands */
@@ -230,5 +231,7 @@ int	ft_export(char **args, t_var **env_list);
 int	ft_cd(char **args, t_var **env_list);
 int	ft_unset(char **args, t_var **env_list);
 int	ft_exit(t_node *root, t_node *cur, t_var **env, int last_status);
-
+int	apply_redirections(t_node *node);
+int	fork_and_run(t_node *root, t_var **env);
+void	exec_andor_in_child(t_node *root, t_node *cur, t_var **env);
 #endif

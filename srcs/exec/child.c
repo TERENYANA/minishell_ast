@@ -1,24 +1,5 @@
 #include "../minishell.h"
 
-/*
-** FUNCTION: is_directory
-** ----------------------
-** Helper function checking whether a given path points to a directory.
-**
-** Param: path - Path string to inspect (e.g., "/usr/bin" or "./my_folder").
-**
-** Return: 1 (true) if path exists and is a directory, 0 (false) otherwise.
-**
-** HOW IT WORKS:
-** Uses system call `stat()` to retrieve file metadata, then `S_ISDIR()` 
-** macro to check if file mode flags indicate a directory.
-**
-** EXAMPLE TRACE:
-** Input: path = "/usr/bin"
-** 1. stat("/usr/bin", &st) succeeds (returns 0).
-** 2. S_ISDIR(st.st_mode) evaluates to TRUE.
-** 3. Returns 1.
-*/
 static int	is_directory(const char *path)
 {
 	struct stat	st;
@@ -28,28 +9,6 @@ static int	is_directory(const char *path)
 	return (0);
 }
 
-/*
-** FUNCTION: exec_external_cmd
-** ---------------------------
-** Resolves, validates, and executes non-builtin programs (e.g., `ls`, `grep`, `./a.out`).
-**
-** Param: root - Pointer to full AST root (needed to free memory on exit).
-** Param: cur  - Pointer to current command AST node containing `cmd` array.
-** Param: env  - Pointer to environment structure pointer.
-**
-** Return: Does not return on success (`execve` replaces process image).
-**         Exits child process with error status (126 or 127) on failure.
-**
-** POSIX EXIT CODES:
-** - 127: Command not found.
-** - 126: File is found/given but cannot be executed (e.g., permission denied, or path is a directory).
-**
-** EXAMPLE TRACE (`ls -l`):
-** 1. `path = find_cmd_path("ls", *env)` -> returns "/bin/ls".
-** 2. `is_directory("/bin/ls")` returns 0 (it's a binary file, not a directory).
-** 3. `envp = convert_env_list(*env)` converts linked list to NULL-terminated `char **`.
-** 4. `execve("/bin/ls", ["ls", "-l", NULL], envp)` replaces current process image with `ls`.
-*/
 void	exec_external_cmd(t_node *root, t_node *cur, t_var **env)
 {
 	char	*path;
@@ -75,56 +34,120 @@ void	exec_external_cmd(t_node *root, t_node *cur, t_var **env)
 	cleanup_and_exit(root, env, 126);
 }
 
-/*
-** FUNCTION: exec_cmd_in_child
-** ---------------------------
-** Evaluates a simple command node inside a child process.
-** Handles built-ins executing inside pipelines/children and delegates external commands.
-**
-** Param: root - Pointer to full AST root.
-** Param: cur  - Pointer to current command node.
-** Param: env  - Pointer to environment structure pointer.
-**
-** Return: None (Always terminates child process via `cleanup_and_exit`).
-**
-** EXAMPLE TRACE (`echo hello` in child):
-** 1. Checks `cur->cmd` exists.
-** 2. `is_builtin("echo")` returns 1 (true).
-** 3. Calls `dispatch_builtin(cur, env, 0)`.
-** 4. Calls `cleanup_and_exit(root, env, status)` to terminate child cleanly.
-*/
 static void	exec_cmd_in_child(t_node *root, t_node *cur, t_var **env)
 {
 	int	status;
 
+	if (apply_redirections(cur) != 0)
+		cleanup_and_exit(root, env, 1);
 	if (!cur->cmd || !cur->cmd[0])
 		cleanup_and_exit(root, env, 0);
 	if (is_builtin(cur->cmd[0]))
 	{
-		status = dispatch_builtin(cur, env, 0);
+		if (ft_strcmp(cur->cmd[0], "exit") == 0)
+			status = ft_exit(root, cur, env, 0);
+		else
+			status = dispatch_builtin(cur, env, 0);
 		cleanup_and_exit(root, env, status);
 	}
 	exec_external_cmd(root, cur, env);
 }
 
-/*
-** FUNCTION: exec_node_in_child
-** ----------------------------
-** Entry point for executing any AST node type within a child process context.
-**
-** Param: root - Pointer to full AST root node.
-** Param: cur  - Pointer to current sub-tree node to execute.
-** Param: env  - Pointer to environment structure pointer.
-**
-** Return: None.
-**
-** EXAMPLE TRACE:
-** Input: node of type `N_CMD` (`ls -la`).
-** 1. Checks `cur->type == N_CMD`.
-** 2. Passes control to `exec_cmd_in_child`.
-*/
+static void	exec_sub_in_child(t_node *root, t_node *cur, t_var **env)
+{
+	if (apply_redirections(cur) != 0)
+		cleanup_and_exit(root, env, 1);
+	exec_node_in_child(root, cur->left, env);
+}
+
+static void	run_left(t_node *root, t_node *cur, t_var **env, int pf[2])
+{
+	close(pf[0]);
+	dup2(pf[1], STDOUT_FILENO);
+	close(pf[1]);
+	exec_node_in_child(root, cur->left, env);
+}
+
+static void	run_right(t_node *root, t_node *cur, t_var **env, int pf[2])
+{
+	close(pf[1]);
+	dup2(pf[0], STDIN_FILENO);
+	close(pf[0]);
+	exec_node_in_child(root, cur->right, env);
+}
+
+void	exec_pipe_in_child(t_node *root, t_node *cur, t_var **env)
+{
+	int		pf[2];
+	pid_t	lpid;
+	pid_t	rpid;
+	int		wstatus;
+
+	if (pipe(pf) == -1)
+		cleanup_and_exit(root, env, 1);
+	lpid = fork();
+	if (lpid == 0)
+		run_left(root, cur, env, pf);
+	rpid = fork();
+	if (rpid == 0)
+		run_right(root, cur, env, pf);
+	close(pf[0]);
+	close(pf[1]);
+	waitpid(lpid, NULL, 0);
+	waitpid(rpid, &wstatus, 0);
+	cleanup_and_exit(root, env, handle_child_status(wstatus));
+}
+
+void	exec_andor_in_child(t_node *root, t_node *cur, t_var **env)
+{
+	pid_t	pid;
+	int		wstatus;
+	int		status;
+
+	if (apply_redirections(cur) != 0)
+		cleanup_and_exit(root, env, 1);
+	pid = fork();
+	if (pid == 0)
+		exec_node_in_child(root, cur->left, env);
+	waitpid(pid, &wstatus, 0);
+	status = handle_child_status(wstatus);
+	if ((cur->type == N_AND && status == 0)
+		|| (cur->type == N_OR && status != 0))
+	{
+		pid = fork();
+		if (pid == 0)
+			exec_node_in_child(root, cur->right, env);
+		waitpid(pid, &wstatus, 0);
+		status = handle_child_status(wstatus);
+	}
+	cleanup_and_exit(root, env, status);
+}
+
 void	exec_node_in_child(t_node *root, t_node *cur, t_var **env)
 {
 	if (cur->type == N_CMD)
 		exec_cmd_in_child(root, cur, env);
+	else if (cur->type == N_SUB)
+		exec_sub_in_child(root, cur, env);
+	else if (cur->type == N_PIPE)
+		exec_pipe_in_child(root, cur, env);
+	else
+		exec_andor_in_child(root, cur, env);
+}
+
+int	fork_and_run(t_node *root, t_var **env)
+{
+	pid_t	pid;
+	int		wstatus;
+
+	pid = fork();
+	if (pid == -1)
+	{
+		perror("minishell: fork");
+		return (1);
+	}
+	if (pid == 0)
+		exec_node_in_child(root, root, env);
+	waitpid(pid, &wstatus, 0);
+	return (handle_child_status(wstatus));
 }
