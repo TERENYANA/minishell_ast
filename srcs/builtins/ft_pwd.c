@@ -11,7 +11,7 @@ int	ft_pwd(char **args)
 		perror("pwd");
 		return (1);
 	}
-	printf("%s\n", pwd);
+	ft_putendl_fd(pwd, STDOUT_FILENO);
 	free(pwd);
 	return (0);
 }

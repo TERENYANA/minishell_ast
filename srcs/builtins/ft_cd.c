@@ -52,7 +52,7 @@ int	ft_cd(char **args, t_var **env_list)
 		return (1);
 	}
 	if (should_print)
-		printf("%s\n", target_path);
+		ft_putendl_fd(target_path, STDOUT_FILENO);
 	current_pwd = getcwd(NULL, 0);
 	if (!current_pwd)
 	{

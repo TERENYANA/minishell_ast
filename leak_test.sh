@@ -1,4 +1,4 @@
-#!/bin/bash
+!/bin/bash
 # ms_leak_test.sh - Minishell leak / crash / hang tester
 #
 # Design goals (learned the hard way):

@@ -26,7 +26,7 @@ typedef struct s_list
 }					t_list;
 
 # ifndef BUFFER_SIZE
-#  define BUFFER_SIZE 1024
+#  define BUFFER_SIZE 1
 # endif
 
 char				*ft_strchr(const char *s, int c);
