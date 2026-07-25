@@ -2,8 +2,8 @@
 
 int	ft_unset(char **args, t_var **env_list)
 {
-	int	i;
-	int	status;
+	int i;
+	int status;
 
 	if (!args[1])
 		return (0);
@@ -20,8 +20,8 @@ int	ft_unset(char **args, t_var **env_list)
 		}
 		if (valid_name(args[i]) != 0)
 		{
-			// bash silently ignores invalid identifiers for unset
-			// unless the -v option is explicitly provided.
+			// bash ignore silencieusement les identifiants invalides pour unset
+			// à moins que l'option -v ne soit explicitement fournie.
 		}
 		else
 			env_unset(env_list, args[i]);

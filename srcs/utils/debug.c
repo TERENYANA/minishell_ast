@@ -69,7 +69,7 @@ static void	print_cmd(t_node *n)
 
 void	print_tree(t_node *n, int d)
 {
-	int	i;
+	int i;
 
 	i = 0;
 	while (i++ < d)

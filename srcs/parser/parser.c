@@ -101,9 +101,9 @@ t_node	*parse_list(t_token **cur, t_parse_info *info)
 
 t_node	*parsing(t_token *head, t_var *env, int status, int *error_code)
 {
-	t_parse_info	info;
-	t_token			*cur;
-	t_node			*tree;
+	t_parse_info info;
+	t_token *cur;
+	t_node *tree;
 
 	info.env = env;
 	info.status = status;

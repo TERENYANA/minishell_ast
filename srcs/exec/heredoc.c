@@ -1,6 +1,7 @@
 #include "../minishell.h"
 
-static int	write_pipe(int fd, char *line, t_redirect *r, t_var *env, int status)
+static int	write_pipe(int fd, char *line, t_redirect *r, t_var *env,
+		int status)
 {
 	char	*expanded;
 
@@ -97,7 +98,7 @@ static int	process_heredoc(t_redirect *redir, t_var *env, int status_val)
 
 int	process_all_heredocs(t_node *node, t_var *env, int status)
 {
-	t_redirect	*r;
+	t_redirect *r;
 
 	if (!node)
 		return (0);

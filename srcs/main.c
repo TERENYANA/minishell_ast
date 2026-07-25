@@ -1,6 +1,6 @@
 #include "minishell.h"
 
-void	rl_replace_line(const char *text, int clear_undo);
+void		rl_replace_line(const char *text, int clear_undo);
 
 static void	trim_newline(char *line)
 {
@@ -54,9 +54,9 @@ static int	post_readline_status(int prev)
 
 int	main(int argc, char **argv, char **envp)
 {
-	t_var	*env;
-	char	*line;
-	int		status;
+	t_var *env;
+	char *line;
+	int status;
 
 	(void)argc;
 	(void)argv;
@@ -78,7 +78,7 @@ int	main(int argc, char **argv, char **envp)
 		status = run_line(line, &env, status);
 		free(line);
 	}
-	get_next_line(-1); // <-- КРИТИЧНО: полностью очищает статический stash при выходе из shell
+	get_next_line(-1); // <-- CRITIQUE : vide complètement le stash statique à la sortie du shell
 	rl_clear_history();
 	ft_free_env(env);
 	if (isatty(STDIN_FILENO))

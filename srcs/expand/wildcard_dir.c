@@ -3,12 +3,12 @@
 
 static int	visible_match(const char *pat, const char *name)
 {
-	if (name[0] == '.' && pat[0] != '.')   /* скрытые — только явно */
+	if (name[0] == '.' && pat[0] != '.') /* cachés — seulement explicitement */
 		return (0);
 	return (wc_match(pat, name));
 }
 
-/* Собрать все совпадения из "." в NULL-терминированный массив. */
+/* Collecte toutes les correspondances depuis "." dans un tableau terminé par NULL. */
 char	**collect_matches(const char *pattern)
 {
 	DIR				*dir;
@@ -30,11 +30,11 @@ char	**collect_matches(const char *pattern)
 	return (tab);
 }
 
-/* Пузырёк по ft_strcmp — bash сортирует по алфавиту. */
+/* Tri à bulles via ft_strcmp — bash trie par ordre alphabétique. */
 void	sort_tab(char **tab)
 {
-	int		i;
-	char	*tmp;
+	int i;
+	char *tmp;
 
 	i = 0;
 	while (tab[i] && tab[i + 1])

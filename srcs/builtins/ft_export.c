@@ -99,10 +99,10 @@ static int	handle_export_arg(char *arg, t_var **env_list)
 
 int	ft_export(char **args, t_var **env_list)
 {
-	int	i;
-	int	error;
-	int	end_opt;
-	int	ret;
+	int i;
+	int error;
+	int end_opt;
+	int ret;
 
 	if (!args[1])
 		return (print_export(*env_list));

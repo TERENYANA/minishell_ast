@@ -14,14 +14,14 @@ int	is_builtin(char *cmd_name)
 
 int	dispatch_builtin(t_node *node, t_var **env_list, int last_status)
 {
-	char	**args;
-	char	*name;
+	char **args;
+	char *name;
 
 	if (!node || !node->cmd || !node->cmd[0])
 		return (0);
 	args = node->cmd;
 	name = args[0];
-	
+
 	if (ft_strcmp(name, ":") == 0)
 		return (0);
 	if (ft_strcmp(name, "echo") == 0)

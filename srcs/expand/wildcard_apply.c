@@ -1,6 +1,6 @@
 #include "../minishell.h"
 
-/* Вспомогательная функция для добавления строки в массив */
+/* Fonction utilitaire pour ajouter une chaîne à un tableau */
 static int	tab_len(char **tab)
 {
 	int	i;
@@ -41,18 +41,18 @@ int	tab_push(char ***tab, const char *name)
 	return (1);
 }
 
-/* Забирает pattern в собственность при любом исходе. */
+/* S'approprie la chaîne 'pattern' dans tous les cas. */
 int	add_wildcard_args(t_node *node, char *pattern)
 {
-	char	**matches;
-	int		i;
+	char **matches;
+	int i;
 
 	matches = collect_matches(pattern);
 	if (!matches)
 		return (free(pattern), 0);
-	if (!matches[0])                          /* нет совпадений:   */
+	if (!matches[0]) /* pas de correspondance: */
 		return (ft_free_tab(matches), add_arg(node, pattern));
-	sort_tab(matches);                        /* паттерн буквально */
+	sort_tab(matches); /* pattern littéralement */
 	i = 0;
 	while (matches[i])
 	{

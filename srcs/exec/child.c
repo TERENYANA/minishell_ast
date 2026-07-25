@@ -140,8 +140,8 @@ void	exec_andor_in_child(t_node *root, t_node *cur, t_var **env)
 	int	status;
 
 	status = run_subtree(root, cur->left, env);
-	if ((cur->type == N_AND && status == 0)
-		|| (cur->type == N_OR && status != 0))
+	if ((cur->type == N_AND && status == 0) || (cur->type == N_OR
+			&& status != 0))
 		status = run_subtree(root, cur->right, env);
 	cleanup_and_exit(root, env, status);
 }
@@ -161,9 +161,9 @@ void	exec_node_in_child(t_node *root, t_node *cur, t_var **env)
 
 int	fork_and_run(t_node *root, t_var **env)
 {
-	pid_t	pid;
-	int		wstatus;
-	int		status;
+	pid_t pid;
+	int wstatus;
+	int status;
 
 	ignore_signals();
 	pid = fork();
