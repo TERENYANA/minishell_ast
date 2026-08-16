@@ -1,5 +1,8 @@
 #include "../minishell.h"
 
+// Forward declaration for functions defined in parser_sub.c
+t_node	*parse_primary(t_token **cur, t_parse_info *info);
+
 t_node	*parse_command(t_token **cur, t_parse_info *info)
 {
 	t_node	*node;
@@ -45,7 +48,8 @@ t_node	*parse_pipeline(t_token **cur, t_parse_info *info)
 		*cur = (*cur)->next;
 		if (!*cur)
 		{
-			syntax_err("newline", info->error_code);
+			if (info->error_code)
+				*info->error_code = 2;
 			return (ft_free_node(left), NULL);
 		}
 		right = parse_primary(cur, info);
@@ -65,38 +69,36 @@ t_node	*parse_pipeline(t_token **cur, t_parse_info *info)
 
 t_node	*parse_list(t_token **cur, t_parse_info *info)
 {
-	t_node		*left;
+	t_node		*node;
+	t_node_type	type;
 	t_node		*right;
-	t_node		*new_node;
-	t_node_type	op;
 
-	left = parse_pipeline(cur, info);
-	if (!left)
+	node = parse_pipeline(cur, info);
+	if (!node)
 		return (NULL);
 	while (*cur && ((*cur)->type == AND_IF || (*cur)->type == OR_IF))
 	{
-		op = N_OR;
 		if ((*cur)->type == AND_IF)
-			op = N_AND;
+			type = N_AND;
+		else
+			type = N_OR;
 		*cur = (*cur)->next;
 		if (!*cur)
 		{
-			syntax_err("newline", info->error_code);
-			return (ft_free_node(left), NULL);
+			if (info->error_code)
+				*info->error_code = 2;
+			ft_free_node(node);
+			return (NULL);
 		}
 		right = parse_pipeline(cur, info);
 		if (!right)
-			return (ft_free_node(left), NULL);
-		new_node = new_op_node(op, left, right);
-		if (!new_node)
 		{
-			ft_free_node(left);
-			ft_free_node(right);
+			ft_free_node(node);
 			return (NULL);
 		}
-		left = new_node;
+		node = new_op_node(type, node, right);
 	}
-	return (left);
+	return (node);
 }
 
 t_node	*parsing(t_token *head, t_var *env, int status, int *error_code)

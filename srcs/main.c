@@ -1,18 +1,5 @@
 #include "minishell.h"
 
-void	rl_replace_line(const char *text, int clear_undo);
-
-static void	trim_newline(char *line)
-{
-	size_t	len;
-
-	if (!line)
-		return ;
-	len = ft_strlen(line);
-	if (len > 0 && line[len - 1] == '\n')
-		line[len - 1] = '\0';
-}
-
 static int	run_line(char *line, t_var **env, int status)
 {
 	t_token	*tokens;
@@ -65,23 +52,18 @@ int	main(int argc, char **argv, char **envp)
 	while (1)
 	{
 		setup_signal_handlers();
-		if (isatty(STDIN_FILENO))
-			line = readline("minishell$ ");
-		else
-			line = get_next_line(STDIN_FILENO);
+		line = readline("minishell$ ");
 		if (!line)
 			break ;
-		trim_newline(line);
 		status = post_readline_status(status);
 		if (*line && isatty(STDIN_FILENO))
 			add_history(line);
 		status = run_line(line, &env, status);
 		free(line);
 	}
-	get_next_line(-1); // <-- КРИТИЧНО: полностью очищает статический stash при выходе из shell
 	rl_clear_history();
 	ft_free_env(env);
 	if (isatty(STDIN_FILENO))
-		ft_putendl_fd("exit", STDERR_FILENO);
+		ft_putendl_fd("exit", STDOUT_FILENO);
 	return (status);
 }

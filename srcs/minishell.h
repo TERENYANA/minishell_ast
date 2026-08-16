@@ -243,13 +243,7 @@ void			cleanup_and_exit(t_node *root, t_var **env, int code);
 int				ft_strcmp(const char *a, const char *b);
 int				err_msg(const char *prefix, const char *msg, int code);
 
-/* ************************************************************************** */
-/*                        DEBUG — a supprimer avant rendu                     */
-/* ************************************************************************** */
 
-void			print_env(t_var *e);
-void			print_tokens(t_token *h);
-void			print_tree(t_node *n, int d);
 
 //heredoc
 int	process_all_heredocs(t_node *node, t_var *env, int status);

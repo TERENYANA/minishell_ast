@@ -7,11 +7,22 @@ static int	quoted_len(char *s)
 
 	q = s[0];
 	i = 1;
-	while (s[i] && s[i] != q)
+	while (s[i])
+	{
+		if (q == '"' && s[i] == '\\' && s[i + 1])
+		{
+			if (s[i + 1] == '$' || s[i + 1] == '`' || s[i + 1] == '"'
+				|| s[i + 1] == '\\' || s[i + 1] == '\n')
+			{
+				i += 2;
+				continue ;
+			}
+		}
+		if (s[i] == q)
+			return (i + 1);
 		i++;
-	if (!s[i])
-		return (-1);
-	return (i + 1);
+	}
+	return (-1);
 }
 
 int	get_token_len(char *s)
@@ -29,7 +40,12 @@ int	get_token_len(char *s)
 	i = 0;
 	while (s[i] && !is_whitespace(s[i]) && !is_special(s[i]))
 	{
-		if (s[i] == '\'' || s[i] == '"')
+		// Handle escaped characters outside quotes (e.g., \")
+		if (s[i] == '\\' && s[i + 1])
+		{
+			i += 2;
+		}
+		else if (s[i] == '\'' || s[i] == '"')
 		{
 			q = quoted_len(s + i);
 			if (q < 0)

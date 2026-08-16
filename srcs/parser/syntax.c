@@ -67,7 +67,7 @@ static int	check_operators(t_token *t, int *error_code)
 			if (!t->next)
 				return (syntax_err("newline", error_code));
 			if (is_logic(t->next->type) || t->next->type == RPAREN)
-				return (syntax_err(t->next->value, error_code));
+    			return (syntax_err(t->next->value, error_code));
 		}
 		if (is_redir_tok(t->type))
 		{

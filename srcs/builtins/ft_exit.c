@@ -47,7 +47,8 @@ int	ft_exit(t_node *root, t_node *cur, t_var **env, int last_status)
 {
 	long long	code;
 
-	ft_putendl_fd("exit", STDOUT_FILENO);
+	if (isatty(STDIN_FILENO))
+		ft_putendl_fd("exit", STDOUT_FILENO);
 	if (!cur->cmd[1])
 		cleanup_and_exit(root, env, last_status);
 	if (!fits_in_long_long(cur->cmd[1], &code))

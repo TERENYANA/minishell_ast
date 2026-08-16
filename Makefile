@@ -42,9 +42,6 @@ fclean: clean
 
 re: fclean all
 
-debug: CFLAGS += -g3 -fsanitize=address
-debug: re
-
 -include $(DEPS)
 
-.PHONY: all clean fclean re debug
+.PHONY: all clean fclean re 
