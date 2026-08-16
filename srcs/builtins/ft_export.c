@@ -60,9 +60,18 @@ static int	print_export(t_var *env)
 	while (i < n)
 	{
 		if (arr[i]->value)
-			printf("declare -x %s=\"%s\"\n", arr[i]->name, arr[i]->value);
+		{
+			ft_putstr_fd("declare -x ", STDOUT_FILENO);
+			ft_putstr_fd(arr[i]->name, STDOUT_FILENO);
+			ft_putstr_fd("=\"", STDOUT_FILENO);
+			ft_putstr_fd(arr[i]->value, STDOUT_FILENO);
+			ft_putendl_fd("\"", STDOUT_FILENO);
+		}
 		else
-			printf("declare -x %s\n", arr[i]->name);
+		{
+			ft_putstr_fd("declare -x ", STDOUT_FILENO);
+			ft_putendl_fd(arr[i]->name, STDOUT_FILENO);
+		}
 		i++;
 	}
 	free(arr);
@@ -90,10 +99,10 @@ static int	handle_export_arg(char *arg, t_var **env_list)
 
 int	ft_export(char **args, t_var **env_list)
 {
-	int	i;
-	int	error;
-	int	end_opt;
-	int	ret;
+	int i;
+	int error;
+	int end_opt;
+	int ret;
 
 	if (!args[1])
 		return (print_export(*env_list));

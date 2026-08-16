@@ -45,7 +45,7 @@ static void	exit_numeric_err(const char *arg)
 
 int	ft_exit(t_node *root, t_node *cur, t_var **env, int last_status)
 {
-	long long	code;
+	long long code;
 
 	if (isatty(STDIN_FILENO))
 		ft_putendl_fd("exit", STDOUT_FILENO);

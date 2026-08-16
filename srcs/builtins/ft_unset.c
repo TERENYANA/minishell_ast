@@ -2,8 +2,8 @@
 
 int	ft_unset(char **args, t_var **env_list)
 {
-	int	i;
-	int	status;
+	int i;
+	int status;
 
 	if (!args[1])
 		return (0);
@@ -20,10 +20,8 @@ int	ft_unset(char **args, t_var **env_list)
 		}
 		if (valid_name(args[i]) != 0)
 		{
-			ft_putstr_fd("minishell: unset: `", 2);
-			ft_putstr_fd(args[i], 2);
-			ft_putstr_fd("': not a valid identifier\n", 2);
-			status = 1;
+			// bash ignore silencieusement les identifiants invalides pour unset
+			// à moins que l'option -v ne soit explicitement fournie.
 		}
 		else
 			env_unset(env_list, args[i]);

@@ -60,8 +60,8 @@ static int	check_operators(t_token *t, int *error_code)
 	while (t)
 	{
 		if (bad_neighbour(t))
-			return (syntax_err(t->type == WORD && t->next
-					? "(" : t->value, error_code));
+			return (syntax_err(t->type == WORD && t->next ? "(" : t->value,
+					error_code));
 		if (is_logic(t->type))
 		{
 			if (!t->next)

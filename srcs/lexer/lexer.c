@@ -77,8 +77,8 @@ static int	process_one_token(char **p, t_tok_list *list)
 
 t_token	*tokenize_line(char *line, int *err)
 {
-	t_tok_list	list;
-	char		*p;
+	t_tok_list list;
+	char *p;
 
 	*err = 0;
 	list.head = NULL;

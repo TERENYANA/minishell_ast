@@ -1,6 +1,11 @@
 #include "../minishell.h"
 
-typedef enum e_qstate { Q_NONE, Q_SINGLE, Q_DOUBLE }	t_qstate;
+typedef enum e_qstate
+{
+	Q_NONE,
+	Q_SINGLE,
+	Q_DOUBLE
+}			t_qstate;
 
 static char	*append_char(char *res, char c)
 {
@@ -33,10 +38,11 @@ static char	*join_free(char *a, char *b)
 }
 
 /*
-** ИСПРАВЛЕНО:
-** 1. Обработка $? (возврат exit status).
-** 2. Обработка $1..$9 (съедает цифру и возвращает пустую строку, т.к. позиционных аргументов в minishell нет).
-** 3. Обработка одиночного $ или $ перед кавычками/пробелами.
+** CORRIGÉ :
+** 1. Gestion de $? (renvoie le code de sortie).
+** 2. Gestion de $1..$9 (consomme le chiffre et renvoie une chaîne vide,
+	car minishell n'a pas d'arguments positionnels).
+** 3. Gestion d'un $ isolé ou d'un $ devant des guillemets/espaces.
 */
 static char	*expand_dollar(char *s, int *i, t_var *env, int status)
 {
@@ -102,4 +108,3 @@ char	*ft_expand(char *s, t_var *env, int status)
 	}
 	return (res);
 }
-

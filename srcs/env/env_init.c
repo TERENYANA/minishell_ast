@@ -25,9 +25,7 @@ t_var	*new_var(char *envp_line)
 	return (node);
 }
 
-
-// Cette fonction prend une chaîne de envp (par exemple, "USER=yana") et crée un nouveau nœud dans la liste des variables d'environnement.
-
+// Cette fonction prend une chaîne de envp (par exemple,"USER=yana") et crée un nouveau nœud dans la liste des variables d'environnement.
 
 // Cette fonction ajoute un nouveau nœud "node" à la fin de la liste définie par les pointeurs head et tail.
 static void	append_var(t_var **head, t_var **tail, t_var *node)
@@ -45,10 +43,10 @@ static void	append_var(t_var **head, t_var **tail, t_var *node)
 
 t_var	*create_env(char **envp)
 {
-	t_var	*head;
-	t_var	*tail;
-	t_var	*node;
-	int		i;
+	t_var *head;
+	t_var *tail;
+	t_var *node;
+	int i;
 
 	head = NULL;
 	tail = NULL;

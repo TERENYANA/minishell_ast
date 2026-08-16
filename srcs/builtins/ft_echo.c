@@ -14,8 +14,8 @@ static int	is_n_flag(char *arg)
 
 int	ft_echo(char **args)
 {
-	int	i;
-	int	newline;
+	int i;
+	int newline;
 
 	i = 1;
 	newline = 1;

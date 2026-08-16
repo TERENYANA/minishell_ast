@@ -63,8 +63,8 @@ t_redirect	*create_redirect(t_token *op, t_token *target, t_parse_info *info)
 
 int	process_redir(t_node *cmd_node, t_token **cur, t_parse_info *info)
 {
-	t_redirect	*r;
-	t_token		*op;
+	t_redirect *r;
+	t_token *op;
 
 	op = *cur;
 	if (!op || !op->next || op->next->type != WORD)

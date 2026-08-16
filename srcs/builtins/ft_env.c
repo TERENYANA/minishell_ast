@@ -7,7 +7,11 @@ int	ft_env(t_var *env)
 	while (env)
 	{
 		if (env->value)
-			printf("%s=%s\n", env->name, env->value);
+		{
+			ft_putstr_fd(env->name, STDOUT_FILENO);
+			ft_putstr_fd("=", STDOUT_FILENO);
+			ft_putendl_fd(env->value, STDOUT_FILENO);
+		}
 		env = env->next;
 	}
 	return (0);

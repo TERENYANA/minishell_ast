@@ -47,7 +47,7 @@ static void	on_signal_heredoc(int signo)
 
 void	setup_heredoc_signals(void)
 {
-	struct sigaction	sa;
+	struct sigaction sa;
 
 	sa.sa_handler = on_signal_heredoc;
 	sigemptyset(&sa.sa_mask);

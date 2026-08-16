@@ -28,5 +28,3 @@ int	err_msg(const char *prefix, const char *msg, int code)
 	ft_putendl_fd((char *)msg, STDERR_FILENO);
 	return (code);
 }
-
-

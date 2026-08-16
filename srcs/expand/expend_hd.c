@@ -65,8 +65,8 @@ static char	*hd_dollar(char *s, int *i, t_var *env, int status)
 
 char	*expand_heredoc_line(char *s, t_var *env, int status)
 {
-	char	*res;
-	int		i;
+	char *res;
+	int i;
 
 	if (!s)
 		return (NULL);
