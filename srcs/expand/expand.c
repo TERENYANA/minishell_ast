@@ -1,12 +1,5 @@
 #include "../minishell.h"
 
-typedef enum e_qstate
-{
-	Q_NONE,
-	Q_SINGLE,
-	Q_DOUBLE
-}			t_qstate;
-
 static char	*append_char(char *res, char c)
 {
 	int		len;
@@ -37,13 +30,6 @@ static char	*join_free(char *a, char *b)
 	return (res);
 }
 
-/*
-** CORRIGÉ :
-** 1. Gestion de $? (renvoie le code de sortie).
-** 2. Gestion de $1..$9 (consomme le chiffre et renvoie une chaîne vide,
-	car minishell n'a pas d'arguments positionnels).
-** 3. Gestion d'un $ isolé ou d'un $ devant des guillemets/espaces.
-*/
 static char	*expand_dollar(char *s, int *i, t_var *env, int status)
 {
 	int		start;
@@ -64,20 +50,28 @@ static char	*expand_dollar(char *s, int *i, t_var *env, int status)
 		return (NULL);
 	val = get_env_value(name, env);
 	free(name);
-	return (ft_strdup(val ? val : ""));
+	if (val)
+		return (ft_strdup(val));
+	return (ft_strdup(""));
 }
 
 static char	*expand_step(char *s, int *i, t_qstate *q)
 {
 	if (*q != Q_DOUBLE && s[*i] == '\'')
 	{
-		*q = (*q == Q_SINGLE) ? Q_NONE : Q_SINGLE;
+		if (*q == Q_SINGLE)
+			*q = Q_NONE;
+		else
+			*q = Q_SINGLE;
 		(*i)++;
 		return (ft_strdup(""));
 	}
 	if (*q != Q_SINGLE && s[*i] == '"')
 	{
-		*q = (*q == Q_DOUBLE) ? Q_NONE : Q_DOUBLE;
+		if (*q == Q_DOUBLE)
+			*q = Q_NONE;
+		else
+			*q = Q_DOUBLE;
 		(*i)++;
 		return (ft_strdup(""));
 	}

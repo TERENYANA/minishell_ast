@@ -25,10 +25,25 @@ static int	quoted_len(char *s)
 	return (-1);
 }
 
+static int	token_step(char *s, int i)
+{
+	int	q;
+
+	if (s[i] == '\\' && s[i + 1])
+		return (i + 2);
+	if (s[i] == '\'' || s[i] == '"')
+	{
+		q = quoted_len(s + i);
+		if (q < 0)
+			return (-1);
+		return (i + q);
+	}
+	return (i + 1);
+}
+
 int	get_token_len(char *s)
 {
 	int	i;
-	int	q;
 
 	if (is_special(s[0]))
 	{
@@ -38,23 +53,8 @@ int	get_token_len(char *s)
 		return (1);
 	}
 	i = 0;
-	while (s[i] && !is_whitespace(s[i]) && !is_special(s[i]))
-	{
-		// Handle escaped characters outside quotes (e.g., \")
-		if (s[i] == '\\' && s[i + 1])
-		{
-			i += 2;
-		}
-		else if (s[i] == '\'' || s[i] == '"')
-		{
-			q = quoted_len(s + i);
-			if (q < 0)
-				return (-1);
-			i += q;
-		}
-		else
-			i++;
-	}
+	while (i >= 0 && s[i] && !is_whitespace(s[i]) && !is_special(s[i]))
+		i = token_step(s, i);
 	return (i);
 }
 
@@ -77,8 +77,8 @@ static int	process_one_token(char **p, t_tok_list *list)
 
 t_token	*tokenize_line(char *line, int *err)
 {
-	t_tok_list list;
-	char *p;
+	t_tok_list	list;
+	char		*p;
 
 	*err = 0;
 	list.head = NULL;

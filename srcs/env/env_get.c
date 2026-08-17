@@ -40,10 +40,9 @@ static char	*env_join(t_var *v)
 
 char	**convert_env_list(t_var *env)
 {
-	char **arr;
-	int i;
+	char	**arr;
+	int		i;
 
-	// Nous allouons de la mémoire et la remplissons immédiatement avec des zéros (\0/ NULL)
 	arr = ft_calloc(count_valued(env) + 1, sizeof(char *));
 	if (!arr)
 		return (NULL);
@@ -59,6 +58,5 @@ char	**convert_env_list(t_var *env)
 		}
 		env = env->next;
 	}
-	// car ft_calloc a déjà initialisé tout le tableau à zéro.
 	return (arr);
 }

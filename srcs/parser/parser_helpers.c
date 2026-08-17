@@ -55,6 +55,6 @@ int	is_cmd_end(t_token *t)
 {
 	if (!t)
 		return (1);
-	return (t->type == PIPE || t->type == AND_IF || t->type == OR_IF
-		|| t->type == RPAREN);
+	return (t->type == PIPE || t->type == AND_IF
+		|| t->type == OR_IF || t->type == RPAREN);
 }

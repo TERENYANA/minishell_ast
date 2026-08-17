@@ -1,8 +1,5 @@
 #include "../minishell.h"
 
-/*
-** Fonction utilitaire pour vérifier si le chemin est un dossier.
-*/
 static int	is_directory(const char *path)
 {
 	struct stat	st;
@@ -12,11 +9,6 @@ static int	is_directory(const char *path)
 	return (0);
 }
 
-/*
-** FUNCTION: join_path
-** -------------------
-** Concatène le chemin du dossier et le nom de la commande avec '/'.
-*/
 static char	*join_path(const char *dir, const char *cmd)
 {
 	char	*tmp;
@@ -30,12 +22,6 @@ static char	*join_path(const char *dir, const char *cmd)
 	return (res);
 }
 
-/*
-** FUNCTION: search_in_paths
-** -------------------------
-** Cherche l'exécutable de la commande dans la liste des dossiers de PATH.
-** Important: ignore les éléments qui sont des dossiers.
-*/
 static char	*search_in_paths(char **dirs, const char *cmd)
 {
 	char	*full;
@@ -53,16 +39,11 @@ static char	*search_in_paths(char **dirs, const char *cmd)
 	return (NULL);
 }
 
-/*
-** FUNCTION: find_cmd_path
-** -----------------------
-** Point d'entrée pour résoudre le nom de la commande en un chemin complet.
-*/
 char	*find_cmd_path(char *cmd, t_var *env)
 {
-	char **dirs;
-	char *path;
-	char *found;
+	char	**dirs;
+	char	*path;
+	char	*found;
 
 	if (!cmd || !cmd[0])
 		return (NULL);

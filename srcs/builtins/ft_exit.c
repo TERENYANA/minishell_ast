@@ -1,22 +1,32 @@
 #include "../minishell.h"
 
+static int	skip_ws(const char *s, int i)
+{
+	while (s[i] == ' ' || (s[i] >= 9 && s[i] <= 13))
+		i++;
+	return (i);
+}
+
+static int	parse_sign(const char *s, int *i)
+{
+	if (s[*i] == '+' || s[*i] == '-')
+	{
+		if (s[*i] == '-')
+			return ((*i)++, -1);
+		(*i)++;
+	}
+	return (1);
+}
+
 static int	fits_in_long_long(const char *str, long long *out)
 {
 	int					i;
 	int					sign;
 	unsigned long long	res;
 
-	i = 0;
-	sign = 1;
+	i = skip_ws(str, 0);
+	sign = parse_sign(str, &i);
 	res = 0;
-	while (str[i] == ' ' || (str[i] >= 9 && str[i] <= 13))
-		i++;
-	if (str[i] == '+' || str[i] == '-')
-	{
-		if (str[i] == '-')
-			sign = -1;
-		i++;
-	}
 	if (!ft_isdigit(str[i]))
 		return (0);
 	while (ft_isdigit(str[i]))
@@ -28,12 +38,10 @@ static int	fits_in_long_long(const char *str, long long *out)
 			return (0);
 		i++;
 	}
-	while (str[i] == ' ' || (str[i] >= 9 && str[i] <= 13))
-		i++;
+	i = skip_ws(str, i);
 	if (str[i] != '\0')
 		return (0);
-	*out = (long long)res * sign;
-	return (1);
+	return (*out = (long long)res * sign, 1);
 }
 
 static void	exit_numeric_err(const char *arg)
@@ -45,7 +53,7 @@ static void	exit_numeric_err(const char *arg)
 
 int	ft_exit(t_node *root, t_node *cur, t_var **env, int last_status)
 {
-	long long code;
+	long long	code;
 
 	if (isatty(STDIN_FILENO))
 		ft_putendl_fd("exit", STDOUT_FILENO);
@@ -54,7 +62,7 @@ int	ft_exit(t_node *root, t_node *cur, t_var **env, int last_status)
 	if (!fits_in_long_long(cur->cmd[1], &code))
 	{
 		exit_numeric_err(cur->cmd[1]);
-		cleanup_and_exit(root, env, 2);
+		cleanup_and_exit(root, env, 255);
 	}
 	if (cur->cmd[2])
 		return (err_msg("exit", "too many arguments", 1));

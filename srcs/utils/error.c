@@ -17,6 +17,7 @@ int	ft_strcmp(const char *a, const char *b)
 		i++;
 	return ((unsigned char)a[i] - (unsigned char)b[i]);
 }
+
 int	err_msg(const char *prefix, const char *msg, int code)
 {
 	ft_putstr_fd("minishell: ", STDERR_FILENO);

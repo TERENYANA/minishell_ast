@@ -1,19 +1,23 @@
 #include "../minishell.h"
 
-static int	sub_redirs(t_node *sub, t_token **cur, t_parse_info *info)
+static t_node	*wrap_sub(t_node *inner, t_token **cur, t_parse_info *info)
 {
+	t_node	*sub;
+
+	sub = new_op_node(N_SUB, inner, NULL);
+	if (!sub)
+		return (NULL);
 	while (*cur && is_redir_tok((*cur)->type))
 	{
 		if (!process_redir(sub, cur, info))
-			return (0);
+			return (ft_free_node(sub), NULL);
 	}
-	return (1);
+	return (sub);
 }
 
 t_node	*parse_primary(t_token **cur, t_parse_info *info)
 {
 	t_node	*inner;
-	t_node	*sub;
 
 	if (!*cur)
 		return (NULL);
@@ -26,20 +30,12 @@ t_node	*parse_primary(t_token **cur, t_parse_info *info)
 	if (!*cur || (*cur)->type != RPAREN)
 	{
 		ft_free_node(inner);
-		syntax_err(*cur ? (*cur)->value : "newline", info->error_code);
+		if (*cur)
+			syntax_err((*cur)->value, info->error_code);
+		else
+			syntax_err("newline", info->error_code);
 		return (NULL);
 	}
 	*cur = (*cur)->next;
-	sub = new_op_node(N_SUB, inner, NULL);
-	if (!sub)
-	{
-		ft_free_node(inner);
-		return (NULL);
-	}
-	if (!sub_redirs(sub, cur, info))
-	{
-		ft_free_node(sub);
-		return (NULL);
-	}
-	return (sub);
+	return (wrap_sub(inner, cur, info));
 }

@@ -28,11 +28,6 @@ bool	add_token(char *value, t_token_type type, t_tok_list *list)
 	return (true);
 }
 
-/*
-** CORRIGÉ : Si un token commence par des guillemets,
-	c'est TOUJOURS un mot ordinaire (WORD),
-** même s'il contient '|', '&&', '>', etc.
-*/
 t_token_type	assign_type(const char *s)
 {
 	if (s[0] == '\'' || s[0] == '"')
@@ -60,7 +55,7 @@ t_token_type	assign_type(const char *s)
 
 char	*extract_quoted(char *s, int len)
 {
-	char *res;
+	char	*res;
 
 	res = malloc(len + 1);
 	if (!res)

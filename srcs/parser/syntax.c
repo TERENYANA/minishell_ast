@@ -5,19 +5,6 @@ static int	is_logic(t_token_type t)
 	return (t == PIPE || t == AND_IF || t == OR_IF);
 }
 
-int	syntax_err(const char *tok, int *error_code)
-{
-	ft_putstr_fd("minishell: syntax error near unexpected token `", 2);
-	if (tok)
-		ft_putstr_fd((char *)tok, 2);
-	else
-		ft_putstr_fd("newline", 2);
-	ft_putendl_fd("'", 2);
-	if (error_code)
-		*error_code = 2;
-	return (0);
-}
-
 static int	check_parens(t_token *t, int *error_code)
 {
 	int	depth;
@@ -27,8 +14,10 @@ static int	check_parens(t_token *t, int *error_code)
 	{
 		if (t->type == LPAREN)
 		{
-			if (!t->next || t->next->type == RPAREN)
-				return (syntax_err(t->next ? ")" : "(", error_code));
+			if (!t->next)
+				return (syntax_err("(", error_code));
+			if (t->next->type == RPAREN)
+				return (syntax_err(")", error_code));
 			depth++;
 		}
 		if (t->type == RPAREN)
@@ -60,21 +49,23 @@ static int	check_operators(t_token *t, int *error_code)
 	while (t)
 	{
 		if (bad_neighbour(t))
-			return (syntax_err(t->type == WORD && t->next ? "(" : t->value,
-					error_code));
+		{
+			if (t->type == WORD && t->next)
+				return (syntax_err("(", error_code));
+			return (syntax_err(t->value, error_code));
+		}
 		if (is_logic(t->type))
 		{
 			if (!t->next)
 				return (syntax_err("newline", error_code));
 			if (is_logic(t->next->type) || t->next->type == RPAREN)
-    			return (syntax_err(t->next->value, error_code));
+				return (syntax_err(t->next->value, error_code));
 		}
-		if (is_redir_tok(t->type))
+		if (is_redir_tok(t->type) && (!t->next || t->next->type != WORD))
 		{
 			if (!t->next)
 				return (syntax_err("newline", error_code));
-			if (t->next->type != WORD)
-				return (syntax_err(t->next->value, error_code));
+			return (syntax_err(t->next->value, error_code));
 		}
 		t = t->next;
 	}

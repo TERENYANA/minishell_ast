@@ -1,4 +1,11 @@
-#include "minishell.h"
+#include "./minishell.h"
+
+static int	err_or(int err, int fallback)
+{
+	if (err)
+		return (err);
+	return (fallback);
+}
 
 static int	run_line(char *line, t_var **env, int status)
 {
@@ -9,7 +16,7 @@ static int	run_line(char *line, t_var **env, int status)
 	err = 0;
 	tokens = tokenize_line(line, &err);
 	if (!tokens)
-		return (err ? err : status);
+		return (err_or(err, status));
 	if (!syntax_ok(tokens, &err))
 	{
 		free_token_list(tokens);
@@ -18,7 +25,7 @@ static int	run_line(char *line, t_var **env, int status)
 	tree = parsing(tokens, *env, status, &err);
 	free_token_list(tokens);
 	if (!tree)
-		return (err ? err : 2);
+		return (err_or(err, 2));
 	if (process_all_heredocs(tree, *env, status) == -1)
 	{
 		ft_free_node(tree);
@@ -39,28 +46,34 @@ static int	post_readline_status(int prev)
 	return (prev);
 }
 
-int	main(int argc, char **argv, char **envp)
+static void	main_loop(t_var **env, int *status)
 {
-	t_var	*env;
 	char	*line;
-	int		status;
 
-	(void)argc;
-	(void)argv;
-	env = create_env(envp);
-	status = 0;
 	while (1)
 	{
 		setup_signal_handlers();
 		line = readline("minishell$ ");
 		if (!line)
 			break ;
-		status = post_readline_status(status);
+		*status = post_readline_status(*status);
 		if (*line && isatty(STDIN_FILENO))
 			add_history(line);
-		status = run_line(line, &env, status);
+		*status = run_line(line, env, *status);
 		free(line);
 	}
+}
+
+int	main(int argc, char **argv, char **envp)
+{
+	t_var	*env;
+	int		status;
+
+	(void)argc;
+	(void)argv;
+	env = create_env(envp);
+	status = 0;
+	main_loop(&env, &status);
 	rl_clear_history();
 	ft_free_env(env);
 	if (isatty(STDIN_FILENO))

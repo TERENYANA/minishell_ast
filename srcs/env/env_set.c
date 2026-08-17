@@ -65,7 +65,7 @@ static void	env_remove(t_var **env, t_var *node)
 
 void	env_unset(t_var **env, const char *name)
 {
-	t_var *node;
+	t_var	*node;
 
 	node = find_var(*env, name);
 	if (node)

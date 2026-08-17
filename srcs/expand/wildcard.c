@@ -20,10 +20,6 @@ int	has_unquoted_star(const char *s)
 	return (0);
 }
 
-/*
-** CORRIGÉ : Réduction des astérisques consécutifs ('**' -> '*').
-** Cela évite une récursion trop profonde et un crash par Segfault.
-*/
 int	wc_match(const char *pat, const char *s)
 {
 	while (*pat == '*' && *(pat + 1) == '*')

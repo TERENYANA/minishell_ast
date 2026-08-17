@@ -25,8 +25,8 @@ static int	perror_redir(const char *target)
 
 int	apply_redirections(t_node *cmd_node)
 {
-	t_redirect *r;
-	int fd;
+	t_redirect	*r;
+	int			fd;
 
 	if (!cmd_node)
 		return (0);
@@ -41,7 +41,6 @@ int	apply_redirections(t_node *cmd_node)
 		else
 			dup2(fd, STDOUT_FILENO);
 		close(fd);
-		/* Si c'est un heredoc, on réinitialise fd pour éviter les doublons */
 		if (r->type == HEREDOC)
 			r->heredoc_fd = -1;
 		r = r->next;
