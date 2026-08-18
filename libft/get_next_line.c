@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   get_next_line.c                                    :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: masolet- <masolet-@student.42.fr>          +#+  +:+       +#+        */
+/*   By: yyuskiv <yyuskiv@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/11/18 14:29:58 by masolet-          #+#    #+#             */
-/*   Updated: 2025/12/04 15:45:59 by masolet-         ###   ########.fr       */
+/*   Updated: 2026/08/18 16:23:37 by yyuskiv          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -16,24 +16,11 @@
 # define BUFFER_SIZE 42
 #endif
 
-static char	*extract_line(char **stash)
+static char	*split_stash(char **stash, int i)
 {
 	char	*line;
 	char	*rest;
-	int		i;
 
-	if (!*stash || !**stash)
-	{
-		if (*stash)
-		{
-			free(*stash);
-			*stash = NULL;
-		}
-		return (NULL);
-	}
-	i = 0;
-	while ((*stash)[i] && (*stash)[i] != '\n')
-		i++;
 	if ((*stash)[i] == '\n')
 	{
 		line = ft_substr(*stash, 0, i + 1);
@@ -55,10 +42,39 @@ static char	*extract_line(char **stash)
 	return (line);
 }
 
+static char	*extract_line(char **stash)
+{
+	int	i;
+
+	if (!*stash || !**stash)
+	{
+		if (*stash)
+		{
+			free(*stash);
+			*stash = NULL;
+		}
+		return (NULL);
+	}
+	i = 0;
+	while ((*stash)[i] && (*stash)[i] != '\n')
+		i++;
+	return (split_stash(stash, i));
+}
+
+static char	*append_buf(char *stash, char *buf)
+{
+	char	*tmp;
+
+	if (!stash)
+		return (ft_strdup(buf));
+	tmp = ft_strjoin(stash, buf);
+	free(stash);
+	return (tmp);
+}
+
 static char	*read_buf(int fd, char *stash)
 {
 	char	buf[BUFFER_SIZE + 1];
-	char	*tmp;
 	ssize_t	r;
 
 	r = 1;
@@ -74,14 +90,7 @@ static char	*read_buf(int fd, char *stash)
 		if (r == 0)
 			break ;
 		buf[r] = '\0';
-		if (!stash)
-			stash = ft_strdup(buf);
-		else
-		{
-			tmp = ft_strjoin(stash, buf);
-			free(stash);
-			stash = tmp;
-		}
+		stash = append_buf(stash, buf);
 	}
 	return (stash);
 }
