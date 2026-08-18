@@ -70,6 +70,7 @@ void	exec_pipe_in_child(t_node *root, t_node *cur, t_var **env)
 	if (pipe(pf) == -1)
 		cleanup_and_exit(root, env, 1);
 	lpid = fork_left(root, cur, env, pf);
+	usleep(10000);
 	rpid = fork_right(root, cur, env, pf);
 	close(pf[0]);
 	close(pf[1]);
