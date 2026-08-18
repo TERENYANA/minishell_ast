@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   minishell.h                                        :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: yyuskiv <yyuskiv@learner.42.tech>          +#+  +:+       +#+        */
+/*   By: yyuskiv <yyuskiv@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/08/18 16:08:20 by yyuskiv           #+#    #+#             */
-/*   Updated: 2026/08/18 16:08:38 by yyuskiv          ###   ########.fr       */
+/*   Updated: 2026/08/18 17:45:47 by yyuskiv          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -174,6 +174,7 @@ void			sort_tab(char **tab);
 
 char			*find_cmd_path(char *cmd, t_var *env);
 int				run_tree(t_node *root, t_var **env, int last_status);
+int				run_line(char *line, t_var **env, int status);
 int				handle_child_status(int wstatus);
 int				apply_redirections(t_node *node);
 int				fork_and_run(t_node *root, t_var **env);

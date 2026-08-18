@@ -5,48 +5,12 @@
 /*                                                    +:+ +:+         +:+     */
 /*   By: yyuskiv <yyuskiv@learner.42.tech>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2026/08/18 16:04:42 by yyuskiv           #+#    #+#             */
-/*   Updated: 2026/08/18 16:04:51 by yyuskiv          ###   ########.fr       */
+/*   Created: 2026/08/18 17:47:16 by yyuskiv           #+#    #+#             */
+/*   Updated: 2026/08/18 17:48:52 by yyuskiv          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "./minishell.h"
-
-static int	err_or(int err, int fallback)
-{
-	if (err)
-		return (err);
-	return (fallback);
-}
-
-static int	run_line(char *line, t_var **env, int status)
-{
-	t_token	*tokens;
-	t_node	*tree;
-	int		err;
-
-	err = 0;
-	tokens = tokenize_line(line, &err);
-	if (!tokens)
-		return (err_or(err, status));
-	if (!syntax_ok(tokens, &err))
-	{
-		free_token_list(tokens);
-		return (2);
-	}
-	tree = parsing(tokens, *env, status, &err);
-	free_token_list(tokens);
-	if (!tree)
-		return (err_or(err, 2));
-	if (process_all_heredocs(tree, *env, status) == -1)
-	{
-		ft_free_node(tree);
-		return (130);
-	}
-	status = run_tree(tree, env, status);
-	ft_free_node(tree);
-	return (status);
-}
 
 static int	post_readline_status(int prev)
 {
@@ -58,6 +22,29 @@ static int	post_readline_status(int prev)
 	return (prev);
 }
 
+/*
+ ** Lecture d'une ligne selon le contexte :
+ **   - terminal (tty)  -> readline, avec prompt, historique, edition
+ **   - pipe / fichier  -> get_next_line, sans prompt
+ ** get_next_line laisse le '\n' final : on le retire pour que la commande
+ ** soit reconnue (sinon "env\n" != "env").
+ */
+static char	*read_input(void)
+{
+	char	*line;
+	size_t	len;
+
+	if (isatty(STDIN_FILENO))
+		return (readline("minishell$ "));
+	line = get_next_line(STDIN_FILENO);
+	if (!line)
+		return (NULL);
+	len = ft_strlen(line);
+	if (len > 0 && line[len - 1] == '\n')
+		line[len - 1] = '\0';
+	return (line);
+}
+
 static void	main_loop(t_var **env, int *status)
 {
 	char	*line;
@@ -65,7 +52,7 @@ static void	main_loop(t_var **env, int *status)
 	while (1)
 	{
 		setup_signal_handlers();
-		line = readline("minishell$ ");
+		line = read_input();
 		if (!line)
 			break ;
 		*status = post_readline_status(*status);
@@ -86,6 +73,7 @@ int	main(int argc, char **argv, char **envp)
 	env = create_env(envp);
 	status = 0;
 	main_loop(&env, &status);
+	get_next_line(-1);
 	rl_clear_history();
 	ft_free_env(env);
 	if (isatty(STDIN_FILENO))
