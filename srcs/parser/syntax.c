@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   syntax.c                                           :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: yyuskiv <yyuskiv@learner.42.tech>          +#+  +:+       +#+        */
+/*   By: masolet- <masolet-@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/08/18 16:13:13 by yyuskiv           #+#    #+#             */
-/*   Updated: 2026/08/18 16:13:14 by yyuskiv          ###   ########.fr       */
+/*   Updated: 2026/08/20 17:31:34 by masolet-         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -27,9 +27,9 @@ static int	check_parens(t_token *t, int *error_code)
 		if (t->type == LPAREN)
 		{
 			if (!t->next)
-				return (syntax_err("(", error_code));
-			if (t->next->type == RPAREN)
-				return (syntax_err(")", error_code));
+				return (syntax_err("newline", error_code));
+			if (t->next->type == RPAREN || is_logic(t->next->type))
+				return (syntax_err(t->next->value, error_code));
 			depth++;
 		}
 		if (t->type == RPAREN)
@@ -62,7 +62,7 @@ static int	check_operators(t_token *t, int *error_code)
 	{
 		if (bad_neighbour(t))
 		{
-			if (t->type == WORD && t->next)
+			if (t->type == WORD && t->next && t->next->type == LPAREN)
 				return (syntax_err("(", error_code));
 			return (syntax_err(t->value, error_code));
 		}

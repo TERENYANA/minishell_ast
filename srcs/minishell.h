@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   minishell.h                                        :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: yyuskiv <yyuskiv@student.42.fr>            +#+  +:+       +#+        */
+/*   By: masolet- <masolet-@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/08/18 16:08:20 by yyuskiv           #+#    #+#             */
-/*   Updated: 2026/08/18 17:45:47 by yyuskiv          ###   ########.fr       */
+/*   Updated: 2026/08/20 16:53:26 by masolet-         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -163,6 +163,8 @@ t_node			*parse_primary(t_token **cur, t_parse_info *info);
 t_node			*new_op_node(t_node_type type, t_node *left, t_node *right);
 
 char			*ft_expand(char *s, t_var *env, int status);
+char			*append_char(char *res, char c);
+int				handle_escape(char **res, char *s, int *i, t_qstate q);
 char			*expand_heredoc_line(char *s, t_var *env, int status);
 
 char			**collect_matches(const char *pattern);

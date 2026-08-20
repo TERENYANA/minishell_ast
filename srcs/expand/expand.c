@@ -3,32 +3,14 @@
 /*                                                        :::      ::::::::   */
 /*   expand.c                                           :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: yyuskiv <yyuskiv@learner.42.tech>          +#+  +:+       +#+        */
+/*   By: masolet- <masolet-@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/08/18 15:47:58 by yyuskiv           #+#    #+#             */
-/*   Updated: 2026/08/18 15:48:00 by yyuskiv          ###   ########.fr       */
+/*   Updated: 2026/08/20 17:05:15 by masolet-         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "../minishell.h"
-
-static char	*append_char(char *res, char c)
-{
-	int		len;
-	char	*new;
-
-	if (!res)
-		return (NULL);
-	len = ft_strlen(res);
-	new = malloc(len + 2);
-	if (!new)
-		return (free(res), NULL);
-	ft_memcpy(new, res, len);
-	new[len] = c;
-	new[len + 1] = '\0';
-	free(res);
-	return (new);
-}
 
 static char	*join_free(char *a, char *b)
 {
@@ -90,6 +72,24 @@ static char	*expand_step(char *s, int *i, t_qstate *q)
 	return (NULL);
 }
 
+char	*append_char(char *res, char c)
+{
+	int		len;
+	char	*new;
+
+	if (!res)
+		return (NULL);
+	len = ft_strlen(res);
+	new = malloc(len + 2);
+	if (!new)
+		return (free(res), NULL);
+	ft_memcpy(new, res, len);
+	new[len] = c;
+	new[len + 1] = '\0';
+	free(res);
+	return (new);
+}
+
 char	*ft_expand(char *s, t_var *env, int status)
 {
 	t_qstate	q;
@@ -107,10 +107,13 @@ char	*ft_expand(char *s, t_var *env, int status)
 		tmp = expand_step(s, &i, &q);
 		if (tmp)
 			res = join_free(res, tmp);
-		else if (s[i] == '$' && q != Q_SINGLE)
-			res = join_free(res, expand_dollar(s, &i, env, status));
-		else
-			res = append_char(res, s[i++]);
+		else if (!handle_escape(&res, s, &i, q))
+		{
+			if (s[i] == '$' && q != Q_SINGLE)
+				res = join_free(res, expand_dollar(s, &i, env, status));
+			else
+				res = append_char(res, s[i++]);
+		}
 	}
 	return (res);
 }
