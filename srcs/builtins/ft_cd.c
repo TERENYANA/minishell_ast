@@ -72,6 +72,11 @@ int	ft_cd(char **args, t_var **env_list)
 	char	*old_pwd;
 	int		should_print;
 
+	if (args[1] && args[2])
+	{
+		ft_putstr_fd("minishell: cd: too many arguments\n", 2);
+		return (1);
+	}
 	target_path = get_target_path(args, *env_list, &should_print);
 	if (!target_path)
 		return (1);
