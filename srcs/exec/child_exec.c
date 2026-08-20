@@ -6,7 +6,7 @@
 /*   By: yyuskiv <yyuskiv@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/08/18 15:42:38 by yyuskiv           #+#    #+#             */
-/*   Updated: 2026/08/18 18:17:51 by yyuskiv          ###   ########.fr       */
+/*   Updated: 2026/08/20 11:41:37 by yyuskiv          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -28,7 +28,10 @@ static char	*cmd_path_or_exit(t_node *root, t_node *cur, t_var **env)
 	path = find_cmd_path(cur->cmd[0], *env);
 	if (!path)
 	{
-		err_msg(cur->cmd[0], "command not found", 0);
+		if (ft_strchr(cur->cmd[0], '/'))
+			err_msg(cur->cmd[0], "No such file or directory", 0);
+		else
+			err_msg(cur->cmd[0], "command not found", 0);
 		cleanup_and_exit(root, env, 127);
 	}
 	if (is_directory(path))

@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   ft_exit.c                                          :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: yyuskiv <yyuskiv@learner.42.tech>          +#+  +:+       +#+        */
+/*   By: yyuskiv <yyuskiv@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/08/18 15:36:03 by yyuskiv           #+#    #+#             */
-/*   Updated: 2026/08/18 15:36:06 by yyuskiv          ###   ########.fr       */
+/*   Updated: 2026/08/20 11:40:09 by yyuskiv          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -74,7 +74,7 @@ int	ft_exit(t_node *root, t_node *cur, t_var **env, int last_status)
 	if (!fits_in_long_long(cur->cmd[1], &code))
 	{
 		exit_numeric_err(cur->cmd[1]);
-		cleanup_and_exit(root, env, 255);
+		cleanup_and_exit(root, env, 2);
 	}
 	if (cur->cmd[2])
 		return (err_msg("exit", "too many arguments", 1));

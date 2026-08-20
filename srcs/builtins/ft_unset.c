@@ -25,7 +25,7 @@ static int	unset_name_err(char *arg)
 	ft_putstr_fd("minishell: unset: `", 2);
 	ft_putstr_fd(arg, 2);
 	ft_putstr_fd("': not a valid identifier\n", 2);
-	return (1);
+	return (0);
 }
 
 int	ft_unset(char **args, t_var **env_list)

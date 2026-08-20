@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   path.c                                             :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: yyuskiv <yyuskiv@learner.42.tech>          +#+  +:+       +#+        */
+/*   By: yyuskiv <yyuskiv@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/08/18 15:43:35 by yyuskiv           #+#    #+#             */
-/*   Updated: 2026/08/18 15:43:37 by yyuskiv          ###   ########.fr       */
+/*   Updated: 2026/08/20 11:23:05 by yyuskiv          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -60,7 +60,11 @@ char	*find_cmd_path(char *cmd, t_var *env)
 	if (!cmd || !cmd[0])
 		return (NULL);
 	if (ft_strchr(cmd, '/'))
+	{
+		if (access(cmd, F_OK) != 0)
+			return (NULL);
 		return (ft_strdup(cmd));
+	}
 	path = get_env_value("PATH", env);
 	if (!path)
 		return (NULL);

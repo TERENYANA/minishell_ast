@@ -61,6 +61,10 @@ parsing=(
     "nonexistent_cmd_xyz"
     "./nonexistent"
     "/bin/nonexistent_xyz"
+    "echo |"
+    "| echo"
+    "echo >"
+    "> >"
 )
 
 quotes=(
@@ -77,6 +81,9 @@ quotes=(
     "echo \"42\"'\$'\"42\""
     "echo 'a'\"b\"'c'"
     "echo \"a\"'b'\"c\""
+    "echo \"\"\"\""
+    "echo ''''"
+    "echo \"'\"'\"'\""
 )
 
 redirects=(
@@ -99,6 +106,10 @@ redirects=(
     "echo a > out1"
     "echo b > out1"
     "cat out1"
+    "echo a > f1 > f2 > f3"
+    "< nonexistent_file cat"
+    "echo test > /does/not/exist/file"
+    "cat << EOF | cat"
 )
 
 pipes=(
@@ -113,6 +124,8 @@ pipes=(
     "echo hi | cat | cat | echo done"
     "ls -l / | grep home | wc -l"
     "cat file1 | cat | cat > out1"
+    "echo a | | echo b"
+    "sleep 0.1 | sleep 0.1 | sleep 0.1"
 )
 
 env=(
@@ -137,6 +150,11 @@ env=(
     "export TEST=42"
     "unset TEST"
     "echo \$TEST"
+    "export =value"
+    "export 1VAR=value"
+    "unset 1VAR"
+    "export VAR1=1 VAR2=2 VAR1=3"
+    "echo \$?"
 )
 
 exit_status=(
@@ -196,6 +214,8 @@ mix=(
     "cat out1"
     "false || echo recovered > out1"
     "echo start | cat | cat > out1 | cat"
+    "echo a > out1 | echo b > out2 | cat < out1"
+    "< file1 cat | wc -l > out1"
 )
 
 # ============================================================================
