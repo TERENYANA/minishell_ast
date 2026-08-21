@@ -186,6 +186,7 @@ void			exec_pipe_in_child(t_node *root, t_node *cur, t_var **env);
 void			exec_andor_in_child(t_node *root, t_node *cur, t_var **env);
 int				process_all_heredocs(t_node *node, t_var *env, int status);
 void			heredoc_child(int p[2], t_hd *hd);
+void			close_heredoc_fds(t_node *node);
 
 int				is_builtin(char *cmd_name);
 int				dispatch_builtin(t_node *node, t_var **env_list,

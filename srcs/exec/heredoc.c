@@ -46,7 +46,7 @@ int	process_all_heredocs(t_node *node, t_var *env, int status)
 
 	if (!node)
 		return (0);
-	if (node->type == N_CMD)
+	if (node->type == N_CMD || node->type == N_SUB)
 	{
 		r = node->redirect;
 		while (r)
@@ -55,9 +55,33 @@ int	process_all_heredocs(t_node *node, t_var *env, int status)
 				return (-1);
 			r = r->next;
 		}
-		return (0);
+		if (node->type == N_CMD)
+			return (0);
 	}
 	if (process_all_heredocs(node->left, env, status) == -1)
 		return (-1);
 	return (process_all_heredocs(node->right, env, status));
+}
+
+void	close_heredoc_fds(t_node *node)
+{
+	t_redirect	*r;
+
+	if (!node)
+		return ;
+	if (node->type == N_CMD || node->type == N_SUB)
+	{
+		r = node->redirect;
+		while (r)
+		{
+			if (r->type == HEREDOC && r->heredoc_fd >= 0)
+			{
+				close(r->heredoc_fd);
+				r->heredoc_fd = -1;
+			}
+			r = r->next;
+		}
+	}
+	close_heredoc_fds(node->left);
+	close_heredoc_fds(node->right);
 }

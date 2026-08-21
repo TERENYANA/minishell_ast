@@ -65,16 +65,15 @@ void	exec_pipe_in_child(t_node *root, t_node *cur, t_var **env)
 	int		pf[2];
 	pid_t	lpid;
 	pid_t	rpid;
-	int		wstatus;
+	int		st_right;
 
 	if (pipe(pf) == -1)
 		cleanup_and_exit(root, env, 1);
 	lpid = fork_left(root, cur, env, pf);
-	usleep(10000);
 	rpid = fork_right(root, cur, env, pf);
 	close(pf[0]);
 	close(pf[1]);
-	waitpid(lpid, &wstatus, 0);
-	waitpid(rpid, &wstatus, 0);
-	cleanup_and_exit(root, env, handle_child_status(wstatus));
+	waitpid(lpid, NULL, 0);
+	waitpid(rpid, &st_right, 0);
+	cleanup_and_exit(root, env, handle_child_status(st_right));
 }
