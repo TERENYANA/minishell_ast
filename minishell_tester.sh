@@ -23,7 +23,7 @@ if [ ! -f "$MS" ] || [ ! -x "$MS" ] || [ -d "$MS" ]; then
     echo -e "${R}Erreur:${N} '$MS' n'est pas un executable."
     echo "Usage: $0 <path/minishell> [section] [-v] [--leaks|--leaks-only]"
     echo "Sections: parsing quotes redirects pipes env exit_status builtins"
-    echo "          signals mix bonus_logic bonus_wildcards all"
+    echo "          signals mix bonus_logic bonus_wildcards fd_advanced all"
     exit 1
 fi
 MS="$(cd "$(dirname "$MS")" && pwd)/$(basename "$MS")"
@@ -65,6 +65,13 @@ parsing=(
     "| echo"
     "echo >"
     "> >"
+    "> <"
+    "> > >"
+    "| |"
+    "| | |"
+    "cat |"
+    "| cat"
+    "echo \"unclosed"
 )
 
 quotes=(
@@ -84,6 +91,11 @@ quotes=(
     "echo \"\"\"\""
     "echo ''''"
     "echo \"'\"'\"'\""
+    "echo \$NONEXISTENT\$USER"
+    "echo \"\" \"\" \"\""
+    "echo '\$USER' \"\$USER\""
+    "false | true"
+    "true | false"
 )
 
 redirects=(
@@ -110,6 +122,11 @@ redirects=(
     "< nonexistent_file cat"
     "echo test > /does/not/exist/file"
     "cat << EOF | cat"
+    "echo a > ."
+    "echo a > /"
+    "cat < ."
+    "echo a > f1 > f2 > f3 > f4 > f5 > f6 > f7 > f8 > f9 > f10"
+    "cat << \"EOF\" | cat"
 )
 
 pipes=(
@@ -126,6 +143,9 @@ pipes=(
     "cat file1 | cat | cat > out1"
     "echo a | | echo b"
     "sleep 0.1 | sleep 0.1 | sleep 0.1"
+    "echo a |"
+    "| cat"
+    "| | |"
 )
 
 env=(
@@ -155,6 +175,12 @@ env=(
     "unset 1VAR"
     "export VAR1=1 VAR2=2 VAR1=3"
     "echo \$?"
+    "false
+echo \$?"
+    "export 1VAR=a"
+    "export VAR-1=b"
+    "export =c"
+    "unset 1VAR VAR-1 ="
 )
 
 exit_status=(
@@ -170,6 +196,11 @@ exit_status=(
     "exit 0"
     "exit 42"
     "exit 255"
+    "exit 42 42"
+    "exit hello"
+    "exit +42"
+    "exit -42"
+    "exit 99999999999999999999"
 )
 
 builtins=(
@@ -193,6 +224,11 @@ builtins=(
     "env | grep TEST || echo gone"
     "env | head -n 5"
     "exit 0"
+    "echo -n -n -nnnn -n hello"
+    "export A=1 B=2 C=3"
+    "unset A B C"
+    "cd ~"
+    "cd -"
 )
 
 signals=(
@@ -214,8 +250,30 @@ mix=(
     "cat out1"
     "false || echo recovered > out1"
     "echo start | cat | cat > out1 | cat"
-    "echo a > out1 | echo b > out2 | cat < out1"
     "< file1 cat | wc -l > out1"
+)
+
+fd_advanced=(
+    "cat < nonexistent | cat | cat > out1"
+    "echo a | (cat < nonexistent) | cat"
+    "echo test > f1 > f2 > f3 > f4 > f5"
+    "< f1 < f2 < f3 < f4 < f5 cat"
+    "echo start | cat | cat | cat | cat | cat | cat | cat | cat > out1"
+    "(echo a | cat) | (cat | cat) > out1"
+    "false || (echo a | cat | cat > out1)"
+    "true && (cat < nonexistent_file | cat > out1)"
+    "echo a > out1 | echo b > out2 | echo c > out3 | cat < out1 | cat < out2 | cat < out3"
+    "cat << EOF | cat << EOF2 | cat << EOF3"
+    "cat < file1 > out1 < file2 > out2 < file3 > out3"
+    "echo a | | echo b"
+    "echo a |"
+    "> out1 > out2 > out3 > out4"
+    "( ( ( echo a | cat ) | cat ) | cat ) > out1"
+    "cd /tmp > /does/not/exist/file"
+    "export TEST_FD=1 > out1 | unset TEST_FD"
+    "< nonexistent echo a > out1"
+    "echo a > out1 < nonexistent > out2"
+    "echo a | cat | cat | cat | cat | cat | cat | cat | cat | cat | cat | cat | cat | cat | cat | cat | cat | cat | cat | cat | cat | cat | cat | cat | cat | cat | cat | cat | cat | cat | cat | cat | cat | cat"
 )
 
 # ============================================================================
@@ -242,6 +300,11 @@ bonus_logic=(
     "((echo 1 && echo 2) || (echo 3 && echo 4))"
     "true && (false || true)"
     "false || (true && false)"
+    "()"
+    "( ( (ls) ) )"
+    "echo a && && echo b"
+    "echo a || || echo b"
+    "(echo a || echo b) | cat"
 )
 
 bonus_wildcards=(
@@ -258,6 +321,7 @@ bonus_wildcards=(
     "ls file*"
     "echo * > out1"
     "echo * | cat"
+    "echo */*"
 )
 
 # ============================================================================
@@ -418,7 +482,7 @@ run_section() {
     [ "$DO_LEAKS" -eq 1 ] && run_leaks "$name" "${arr[@]}"
 }
 
-SECTIONS_ALL="parsing quotes redirects pipes env exit_status builtins signals mix bonus_logic bonus_wildcards"
+SECTIONS_ALL="parsing quotes redirects pipes env exit_status builtins signals mix bonus_logic bonus_wildcards fd_advanced"
 
 echo -e "${B}╔════════════════════════════════════════════╗${N}"
 echo -e "${B}║  MINISHELL TESTER — Subject Strict         ║${N}"
