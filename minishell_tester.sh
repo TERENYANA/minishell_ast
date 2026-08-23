@@ -127,6 +127,7 @@ redirects=(
     "cat < ."
     "echo a > f1 > f2 > f3 > f4 > f5 > f6 > f7 > f8 > f9 > f10"
     "cat << \"EOF\" | cat"
+    "cat << NONEXISTENT_DELIM"
 )
 
 pipes=(
@@ -181,6 +182,7 @@ echo \$?"
     "export VAR-1=b"
     "export =c"
     "unset 1VAR VAR-1 ="
+    "echo 'env | grep SHLVL' | ./minishell > /dev/null"
 )
 
 exit_status=(
@@ -322,6 +324,7 @@ bonus_wildcards=(
     "echo * > out1"
     "echo * | cat"
     "echo */*"
+    "echo s*/*"
 )
 
 # ============================================================================

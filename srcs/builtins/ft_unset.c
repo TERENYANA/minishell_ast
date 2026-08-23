@@ -22,9 +22,7 @@ static int	unset_opt_err(char *arg)
 
 static int	unset_name_err(char *arg)
 {
-	ft_putstr_fd("minishell: unset: `", 2);
-	ft_putstr_fd(arg, 2);
-	ft_putstr_fd("': not a valid identifier\n", 2);
+	(void)arg;
 	return (0);
 }
 

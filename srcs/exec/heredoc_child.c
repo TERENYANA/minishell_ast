@@ -34,7 +34,7 @@ static int	write_pipe(int fd, char *line, t_hd *hd)
 
 	if (hd->redir->expand_heredoc)
 	{
-		expanded = expand_heredoc_line(line, hd->env, hd->status);
+		expanded = expand_heredoc_line(line, *hd->env, hd->status);
 		if (!expanded)
 			return (free(line), -1);
 		write(fd, expanded, ft_strlen(expanded));
@@ -52,7 +52,12 @@ static int	write_pipe(int fd, char *line, t_hd *hd)
 static int	hd_line(int p[2], char *line, t_hd *hd)
 {
 	if (!line)
+	{
+		ft_putstr_fd("minishell: warning: here-document delimited by end-of-file (wanted `", 2);
+		ft_putstr_fd(hd->redir->target, 2);
+		ft_putstr_fd("')\n", 2);
 		return (0);
+	}
 	if (ft_strcmp(line, hd->redir->target) == 0)
 		return (free(line), 0);
 	if (write_pipe(p[1], line, hd) == -1)
@@ -74,9 +79,11 @@ void	heredoc_child(int p[2], t_hd *hd)
 		if (ret <= 0)
 		{
 			close(p[1]);
+			if (hd->line)
+				free(hd->line);
 			if (ret == -1)
-				exit(1);
-			exit(0);
+				cleanup_and_exit(hd->root, hd->env, 1);
+			cleanup_and_exit(hd->root, hd->env, 0);
 		}
 	}
 }

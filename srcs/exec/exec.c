@@ -12,6 +12,31 @@
 
 #include "../minishell.h"
 
+void	expand_cmd_args(t_node *cmd_node, t_var *env, int status)
+{
+	char	**old_cmd;
+	char	*expanded;
+	int		i;
+
+	if (!cmd_node || !cmd_node->cmd)
+		return ;
+	old_cmd = cmd_node->cmd;
+	cmd_node->cmd = NULL;
+	i = 0;
+	while (old_cmd[i])
+	{
+		expanded = ft_expand(old_cmd[i], env, status);
+		if (expanded && expanded[0] == '\0' && !has_quotes(old_cmd[i]))
+			free(expanded);
+		else if (expanded && has_unquoted_star(old_cmd[i]))
+			add_wildcard_args(cmd_node, expanded);
+		else if (expanded)
+			add_arg(cmd_node, expanded);
+		i++;
+	}
+	ft_free_tab(old_cmd);
+}
+
 static int	run_builtin_in_parent(t_node *node, t_var **env, int last_status)
 {
 	int	saved_in;
@@ -28,12 +53,16 @@ static int	run_builtin_in_parent(t_node *node, t_var **env, int last_status)
 			close(saved_out);
 		return (1);
 	}
-	if (apply_redirections(node) != 0)
+	expand_cmd_args(node, *env, last_status);
+	if (apply_redirections(node, *env, last_status) != 0)
 		ret = 1;
-	else if (!node->cmd || !node->cmd[0])
-		ret = 0;
 	else
-		ret = dispatch_builtin(node, env, last_status);
+	{
+		if (!node->cmd || !node->cmd[0])
+			ret = 0;
+		else
+			ret = dispatch_builtin(node, env, last_status);
+	}
 	dup2(saved_in, STDIN_FILENO);
 	dup2(saved_out, STDOUT_FILENO);
 	close(saved_in);
@@ -68,5 +97,5 @@ int	run_tree(t_node *root, t_var **env, int last_status)
 	}
 	if (is_parent_builtin_root(root))
 		return (run_builtin_in_parent(root, env, last_status));
-	return (fork_and_run(root, env));
+	return (fork_and_run(root, env, last_status));
 }

@@ -12,11 +12,12 @@
 
 #include "../minishell.h"
 
-static void	exec_cmd_in_child(t_node *root, t_node *cur, t_var **env)
+static void	exec_cmd_in_child(t_node *root, t_node *cur, t_var **env, int last_status)
 {
 	int	status;
 
-	if (apply_redirections(cur) != 0)
+	expand_cmd_args(cur, *env, last_status);
+	if (apply_redirections(cur, *env, last_status) != 0)
 		cleanup_and_exit(root, env, 1);
 	if (!cur->cmd || !cur->cmd[0])
 		cleanup_and_exit(root, env, 0);
@@ -25,33 +26,33 @@ static void	exec_cmd_in_child(t_node *root, t_node *cur, t_var **env)
 		if (ft_strcmp(cur->cmd[0], "exit") == 0)
 			status = ft_exit(root, cur, env, 0);
 		else
-			status = dispatch_builtin(cur, env, 0);
+			status = dispatch_builtin(cur, env, last_status);
 		cleanup_and_exit(root, env, status);
 	}
 	exec_external_cmd(root, cur, env);
 }
 
-static void	exec_sub_in_child(t_node *root, t_node *cur, t_var **env)
+static void	exec_sub_in_child(t_node *root, t_node *cur, t_var **env, int last_status)
 {
-	if (apply_redirections(cur) != 0)
+	if (apply_redirections(cur, *env, last_status) != 0)
 		cleanup_and_exit(root, env, 1);
-	exec_node_in_child(root, cur->left, env);
+	exec_node_in_child(root, cur->left, env, last_status);
 }
 
-void	exec_node_in_child(t_node *root, t_node *cur, t_var **env)
+void	exec_node_in_child(t_node *root, t_node *cur, t_var **env, int last_status)
 {
 	setup_child_signals();
 	if (cur->type == N_CMD)
-		exec_cmd_in_child(root, cur, env);
+		exec_cmd_in_child(root, cur, env, last_status);
 	else if (cur->type == N_SUB)
-		exec_sub_in_child(root, cur, env);
+		exec_sub_in_child(root, cur, env, last_status);
 	else if (cur->type == N_PIPE)
-		exec_pipe_in_child(root, cur, env);
+		exec_pipe_in_child(root, cur, env, last_status);
 	else
-		exec_andor_in_child(root, cur, env);
+		exec_andor_in_child(root, cur, env, last_status);
 }
 
-int	fork_and_run(t_node *root, t_var **env)
+int	fork_and_run(t_node *root, t_var **env, int last_status)
 {
 	pid_t	pid;
 	int		wstatus;
@@ -66,7 +67,7 @@ int	fork_and_run(t_node *root, t_var **env)
 		return (1);
 	}
 	if (pid == 0)
-		exec_node_in_child(root, root, env);
+		exec_node_in_child(root, root, env, last_status);
 	waitpid(pid, &wstatus, 0);
 	setup_signal_handlers();
 	status = handle_child_status(wstatus);

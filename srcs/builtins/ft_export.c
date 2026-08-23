@@ -26,7 +26,8 @@ static int	handle_export_arg(char *arg, t_var **env_list)
 		free(value);
 		return (1);
 	}
-	env_set(env_list, name, value);
+	if (value || !find_var(*env_list, name))
+		env_set(env_list, name, value);
 	free(name);
 	return (0);
 }

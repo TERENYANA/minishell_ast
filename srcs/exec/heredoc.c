@@ -12,7 +12,7 @@
 
 #include "../minishell.h"
 
-static int	process_heredoc(t_redirect *redir, t_var *env, int status_val)
+static int	process_heredoc(t_redirect *redir, t_var **env, int status_val, t_node *root, char *line)
 {
 	int		p[2];
 	pid_t	pid;
@@ -22,6 +22,8 @@ static int	process_heredoc(t_redirect *redir, t_var *env, int status_val)
 	hd.redir = redir;
 	hd.env = env;
 	hd.status = status_val;
+	hd.root = root;
+	hd.line = line;
 	if (pipe(p) == -1)
 		return (-1);
 	ignore_signals();
@@ -40,7 +42,7 @@ static int	process_heredoc(t_redirect *redir, t_var *env, int status_val)
 	return (0);
 }
 
-int	process_all_heredocs(t_node *node, t_var *env, int status)
+int	process_all_heredocs(t_node *root, t_node *node, t_var **env, int status, char *line)
 {
 	t_redirect	*r;
 
@@ -51,16 +53,16 @@ int	process_all_heredocs(t_node *node, t_var *env, int status)
 		r = node->redirect;
 		while (r)
 		{
-			if (r->type == HEREDOC && process_heredoc(r, env, status) == -1)
+			if (r->type == HEREDOC && process_heredoc(r, env, status, root, line) == -1)
 				return (-1);
 			r = r->next;
 		}
 		if (node->type == N_CMD)
 			return (0);
 	}
-	if (process_all_heredocs(node->left, env, status) == -1)
+	if (process_all_heredocs(root, node->left, env, status, line) == -1)
 		return (-1);
-	return (process_all_heredocs(node->right, env, status));
+	return (process_all_heredocs(root, node->right, env, status, line));
 }
 
 void	close_heredoc_fds(t_node *node)

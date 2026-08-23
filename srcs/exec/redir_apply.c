@@ -35,16 +35,40 @@ static int	perror_redir(const char *target)
 	return (1);
 }
 
-int	apply_redirections(t_node *cmd_node)
+int	apply_redirections(t_node *cmd_node, t_var *env, int status)
 {
 	t_redirect	*r;
 	int			fd;
+	char		*expanded;
 
 	if (!cmd_node)
 		return (0);
 	r = cmd_node->redirect;
 	while (r)
 	{
+		if (r->type != HEREDOC)
+		{
+			expanded = ft_expand(r->target, env, status);
+			if (!expanded || (expanded[0] == '\0' && !has_quotes(r->target)))
+			{
+				ft_putstr_fd("minishell: ", 2);
+				ft_putstr_fd(r->target, 2);
+				ft_putendl_fd(": ambiguous redirect", 2);
+				free(expanded);
+				return (1);
+			}
+			free(r->target);
+			r->target = expanded;
+		}
+		else
+		{
+			// For HEREDOC, we need to remove quotes if they exist, but do not expand variables
+			// Wait, if we use ft_expand with NULL env, it won't expand variables? No, it expands to empty.
+			// Just remove quotes by calling ft_expand normally? Actually heredoc expansion was already done at parsing?
+			// No, setup_heredoc doesn't expand anymore in our fix. But wait, in process_all_heredocs, it uses r->target!
+			// We shouldn't change r->target here for HEREDOC since it's already used. Wait!
+			// We MUST expand/remove quotes for HEREDOC in process_heredoc!
+		}
 		fd = open_redir(r);
 		if (fd < 0)
 			return (perror_redir(r->target));
