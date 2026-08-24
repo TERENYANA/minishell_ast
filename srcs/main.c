@@ -45,6 +45,23 @@ static char	*read_input(void)
 	return (line);
 }
 
+static void	init_env_vars(t_var **env)
+{
+	char	*shlvl_str;
+	int		shlvl;
+
+	shlvl_str = get_env_value("SHLVL", *env);
+	if (shlvl_str)
+		shlvl = ft_atoi(shlvl_str) + 1;
+	else
+		shlvl = 1;
+	shlvl_str = ft_itoa(shlvl);
+	env_set(env, "SHLVL", shlvl_str);
+	if (!find_var(*env, "OLDPWD"))
+		env_set(env, "OLDPWD", NULL);
+	env_set(env, "_", ft_strdup("/usr/bin/env"));
+}
+
 static void	main_loop(t_var **env, int *status)
 {
 	char	*line;
@@ -71,6 +88,7 @@ int	main(int argc, char **argv, char **envp)
 	(void)argc;
 	(void)argv;
 	env = create_env(envp);
+	init_env_vars(&env);
 	status = 0;
 	main_loop(&env, &status);
 	get_next_line(-1);

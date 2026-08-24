@@ -36,9 +36,7 @@ int	run_line(char *line, t_var **env, int status)
 	}
 	tree = parsing(tokens, *env, status, &err);
 	free_token_list(tokens);
-	if (!tree)
-		return (err_or(err, 2));
-	if (process_all_heredocs(tree, *env, status) == -1)
+	if (process_all_heredocs(tree, tree, env, status, line) == -1)
 	{
 		ft_free_node(tree);
 		return (130);

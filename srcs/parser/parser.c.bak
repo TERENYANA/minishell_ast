@@ -55,27 +55,35 @@ t_node	*parse_command(t_token **cur, t_parse_info *info)
 	return (node);
 }
 
+static t_node	*pipe_rhs(t_node *left, t_token **cur, t_parse_info *info)
+{
+	t_node	*right;
+
+	*cur = (*cur)->next;
+	if (!*cur)
+	{
+		if (info->error_code)
+			*info->error_code = 2;
+		return (ft_free_node(left), NULL);
+	}
+	right = parse_primary(cur, info);
+	if (!right)
+		return (ft_free_node(left), NULL);
+	return (new_op_node(N_PIPE, left, right));
+}
+
 t_node	*parse_pipeline(t_token **cur, t_parse_info *info)
 {
 	t_node	*left;
-	t_node	*right;
 
 	left = parse_primary(cur, info);
 	if (!left)
 		return (NULL);
-	if (*cur && (*cur)->type == PIPE)
+	while (*cur && (*cur)->type == PIPE)
 	{
-		*cur = (*cur)->next;
-		if (!*cur)
-		{
-			if (info->error_code)
-				*info->error_code = 2;
-			return (ft_free_node(left), NULL);
-		}
-		right = parse_pipeline(cur, info);
-		if (!right)
-			return (ft_free_node(left), NULL);
-		return (new_op_node(N_PIPE, left, right));
+		left = pipe_rhs(left, cur, info);
+		if (!left)
+			return (NULL);
 	}
 	return (left);
 }

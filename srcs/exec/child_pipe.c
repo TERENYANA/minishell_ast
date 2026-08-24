@@ -12,23 +12,23 @@
 
 #include "../minishell.h"
 
-static void	run_left(t_node *root, t_node *cur, t_var **env, int pf[2])
+static void	run_left(t_node *root, t_node *cur, t_var **env, int pf[2], int last_status)
 {
 	close(pf[0]);
 	dup2(pf[1], STDOUT_FILENO);
 	close(pf[1]);
-	exec_node_in_child(root, cur->left, env);
+	exec_node_in_child(root, cur->left, env, last_status);
 }
 
-static void	run_right(t_node *root, t_node *cur, t_var **env, int pf[2])
+static void	run_right(t_node *root, t_node *cur, t_var **env, int pf[2], int last_status)
 {
 	close(pf[1]);
 	dup2(pf[0], STDIN_FILENO);
 	close(pf[0]);
-	exec_node_in_child(root, cur->right, env);
+	exec_node_in_child(root, cur->right, env, last_status);
 }
 
-static pid_t	fork_left(t_node *root, t_node *cur, t_var **env, int pf[2])
+static pid_t	fork_left(t_node *root, t_node *cur, t_var **env, int pf[2], int last_status)
 {
 	pid_t	pid;
 
@@ -40,11 +40,11 @@ static pid_t	fork_left(t_node *root, t_node *cur, t_var **env, int pf[2])
 		cleanup_and_exit(root, env, 1);
 	}
 	if (pid == 0)
-		run_left(root, cur, env, pf);
+		run_left(root, cur, env, pf, last_status);
 	return (pid);
 }
 
-static pid_t	fork_right(t_node *root, t_node *cur, t_var **env, int pf[2])
+static pid_t	fork_right(t_node *root, t_node *cur, t_var **env, int pf[2], int last_status)
 {
 	pid_t	pid;
 
@@ -56,11 +56,11 @@ static pid_t	fork_right(t_node *root, t_node *cur, t_var **env, int pf[2])
 		cleanup_and_exit(root, env, 1);
 	}
 	if (pid == 0)
-		run_right(root, cur, env, pf);
+		run_right(root, cur, env, pf, last_status);
 	return (pid);
 }
 
-void	exec_pipe_in_child(t_node *root, t_node *cur, t_var **env)
+void	exec_pipe_in_child(t_node *root, t_node *cur, t_var **env, int last_status)
 {
 	int		pf[2];
 	pid_t	lpid;
@@ -69,8 +69,8 @@ void	exec_pipe_in_child(t_node *root, t_node *cur, t_var **env)
 
 	if (pipe(pf) == -1)
 		cleanup_and_exit(root, env, 1);
-	lpid = fork_left(root, cur, env, pf);
-	rpid = fork_right(root, cur, env, pf);
+	lpid = fork_left(root, cur, env, pf, last_status);
+	rpid = fork_right(root, cur, env, pf, last_status);
 	close(pf[0]);
 	close(pf[1]);
 	waitpid(lpid, NULL, 0);
