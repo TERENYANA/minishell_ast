@@ -454,3 +454,4 @@ echo -e "${B}══════════════════════�
 
 [ "$TOTAL_FAIL" -gt 0 ] || [ "$TOTAL_LEAK" -gt 0 ] || [ "$TOTAL_FDLEAK" -gt 0 ] && exit 1
 exit 0
+make a better tester that will check also for leaks, closed fds, and more cases
