@@ -87,6 +87,6 @@ void	exec_andor_in_child(t_node *root, t_node *cur, t_var **env, int last_status
 	status = run_subtree(root, cur->left, env, last_status);
 	if ((cur->type == N_AND && status == 0)
 		|| (cur->type == N_OR && status != 0))
-		status = run_subtree(root, cur->right, env, status); // Pass status as last_status for the right side!
+		status = run_subtree(root, cur->right, env, status);
 	cleanup_and_exit(root, env, status);
 }

@@ -28,9 +28,6 @@ int	ft_echo(char **args)
 {
 	int	i;
 	int	newline;
-	char	pid_msg[100];
-	sprintf(pid_msg, "DEBUG: ft_echo called in PID %d\n", getpid());
-	ft_putstr_fd(pid_msg, 2);
 	i = 1;
 	newline = 1;
 	while (args[i] && is_n_flag(args[i]))

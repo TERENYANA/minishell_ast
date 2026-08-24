@@ -42,7 +42,6 @@ int	run_line(char *line, t_var **env, int status)
 		return (130);
 	}
 	status = run_tree(tree, env, status);
-	ft_putstr_fd("DEBUG: returned from run_tree\n", 2);
 	close_heredoc_fds(tree);
 	ft_free_node(tree);
 	return (status);
