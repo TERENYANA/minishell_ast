@@ -51,15 +51,13 @@ static int	process_target(t_redirect *r, t_var *env, int status)
 {
 	char	*exp;
 	char	**m;
-	int		star;
 
 	if (r->type == HEREDOC)
 		return (0);
-	star = has_unquoted_star(r->target);
 	exp = ft_expand(r->target, env, status);
 	if (!exp || (exp[0] == '\0' && !has_quotes(r->target)))
 		return (ambiguous_redir_error(r->target, exp, NULL));
-	if (star)
+	if (has_unquoted_star(r->target))
 	{
 		m = collect_matches(exp);
 		if (m && m[0] && m[1])
