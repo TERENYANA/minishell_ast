@@ -12,53 +12,54 @@
 
 #include "../minishell.h"
 
-static void	exec_cmd_in_child(t_node *root, t_node *cur, t_var **env, int last_status)
+static void	exec_cmd_in_child(t_node *root, t_node *cur, t_exec_info *info)
 {
 	int	status;
 
-	expand_cmd_args(cur, *env, last_status);
-	if (apply_redirections(cur, *env, last_status) != 0)
-		cleanup_and_exit(root, env, 1);
+	expand_cmd_args(cur, *(info->env), info->last_status);
+	if (apply_redirections(cur, *(info->env), info->last_status) != 0)
+		cleanup_and_exit(root, info->env, 1);
 	close_heredoc_fds(root);
 	if (!cur->cmd || !cur->cmd[0])
-		cleanup_and_exit(root, env, 0);
+		cleanup_and_exit(root, info->env, 0);
 	if (is_builtin(cur->cmd[0]))
 	{
 		if (ft_strcmp(cur->cmd[0], "exit") == 0)
-			status = ft_exit(root, cur, env, 0);
+			status = ft_exit(root, cur, info->env, 0);
 		else
-			status = dispatch_builtin(cur, env, last_status);
-		cleanup_and_exit(root, env, status);
+			status = dispatch_builtin(cur, info->env, info->last_status);
+		cleanup_and_exit(root, info->env, status);
 	}
-	exec_external_cmd(root, cur, env);
+	exec_external_cmd(root, cur, info->env);
 }
 
-static void	exec_sub_in_child(t_node *root, t_node *cur, t_var **env, int last_status)
+static void	exec_sub_in_child(t_node *root, t_node *cur, t_exec_info *info)
 {
-	if (apply_redirections(cur, *env, last_status) != 0)
-		cleanup_and_exit(root, env, 1);
+	if (apply_redirections(cur, *(info->env), info->last_status) != 0)
+		cleanup_and_exit(root, info->env, 1);
 	close_heredoc_fds(root);
-	exec_node_in_child(root, cur->left, env, last_status);
+	exec_node_in_child(root, cur->left, info);
 }
 
-void	exec_node_in_child(t_node *root, t_node *cur, t_var **env, int last_status)
+void	exec_node_in_child(t_node *root, t_node *cur, t_exec_info *info)
 {
 	setup_child_signals();
 	if (cur->type == N_CMD)
-		exec_cmd_in_child(root, cur, env, last_status);
+		exec_cmd_in_child(root, cur, info);
 	else if (cur->type == N_SUB)
-		exec_sub_in_child(root, cur, env, last_status);
+		exec_sub_in_child(root, cur, info);
 	else if (cur->type == N_PIPE)
-		exec_pipe_in_child(root, cur, env, last_status);
+		exec_pipe_in_child(root, cur, info);
 	else
-		exec_andor_in_child(root, cur, env, last_status);
+		exec_andor_in_child(root, cur, info);
 }
 
 int	fork_and_run(t_node *root, t_var **env, int last_status)
 {
-	pid_t	pid;
-	int		wstatus;
-	int		status;
+	pid_t		pid;
+	int			wstatus;
+	int			status;
+	t_exec_info	info;
 
 	ignore_signals();
 	pid = fork();
@@ -69,7 +70,11 @@ int	fork_and_run(t_node *root, t_var **env, int last_status)
 		return (1);
 	}
 	if (pid == 0)
-		exec_node_in_child(root, root, env, last_status);
+	{
+		info.env = env;
+		info.last_status = last_status;
+		exec_node_in_child(root, root, &info);
+	}
 	waitpid(pid, &wstatus, 0);
 	setup_signal_handlers();
 	status = handle_child_status(wstatus);

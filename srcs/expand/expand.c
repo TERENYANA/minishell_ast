@@ -23,8 +23,7 @@ static char	*join_free(char *a, char *b)
 	free(b);
 	return (res);
 }
-	/* $$ should expand to shell PID, but getpid() is not in the
-	** list of authorized functions — left as literal instead. */
+
 static char	*expand_special(char *s, int *i, int status, int *braces)
 {
 	*braces = 0;

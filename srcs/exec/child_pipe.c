@@ -12,23 +12,24 @@
 
 #include "../minishell.h"
 
-static void	run_left(t_node *root, t_node *cur, t_var **env, int pf[2], int last_status)
+static void	run_left(t_node *root, t_node *cur, int pf[2], t_exec_info *info)
 {
 	close(pf[0]);
 	dup2(pf[1], STDOUT_FILENO);
 	close(pf[1]);
-	exec_node_in_child(root, cur->left, env, last_status);
+	exec_node_in_child(root, cur->left, info);
 }
 
-static void	run_right(t_node *root, t_node *cur, t_var **env, int pf[2], int last_status)
+static void	run_right(t_node *root, t_node *cur, int pf[2], t_exec_info *info)
 {
 	close(pf[1]);
 	dup2(pf[0], STDIN_FILENO);
 	close(pf[0]);
-	exec_node_in_child(root, cur->right, env, last_status);
+	exec_node_in_child(root, cur->right, info);
 }
 
-static pid_t	fork_left(t_node *root, t_node *cur, t_var **env, int pf[2], int last_status)
+static pid_t	fork_left(t_node *root, t_node *cur, int pf[2],
+		t_exec_info *info)
 {
 	pid_t	pid;
 
@@ -37,14 +38,15 @@ static pid_t	fork_left(t_node *root, t_node *cur, t_var **env, int pf[2], int la
 	{
 		close(pf[0]);
 		close(pf[1]);
-		cleanup_and_exit(root, env, 1);
+		cleanup_and_exit(root, info->env, 1);
 	}
 	if (pid == 0)
-		run_left(root, cur, env, pf, last_status);
+		run_left(root, cur, pf, info);
 	return (pid);
 }
 
-static pid_t	fork_right(t_node *root, t_node *cur, t_var **env, int pf[2], int last_status)
+static pid_t	fork_right(t_node *root, t_node *cur, int pf[2],
+		t_exec_info *info)
 {
 	pid_t	pid;
 
@@ -53,14 +55,14 @@ static pid_t	fork_right(t_node *root, t_node *cur, t_var **env, int pf[2], int l
 	{
 		close(pf[0]);
 		close(pf[1]);
-		cleanup_and_exit(root, env, 1);
+		cleanup_and_exit(root, info->env, 1);
 	}
 	if (pid == 0)
-		run_right(root, cur, env, pf, last_status);
+		run_right(root, cur, pf, info);
 	return (pid);
 }
 
-void	exec_pipe_in_child(t_node *root, t_node *cur, t_var **env, int last_status)
+void	exec_pipe_in_child(t_node *root, t_node *cur, t_exec_info *info)
 {
 	int		pf[2];
 	pid_t	lpid;
@@ -68,12 +70,12 @@ void	exec_pipe_in_child(t_node *root, t_node *cur, t_var **env, int last_status)
 	int		st_right;
 
 	if (pipe(pf) == -1)
-		cleanup_and_exit(root, env, 1);
-	lpid = fork_left(root, cur, env, pf, last_status);
-	rpid = fork_right(root, cur, env, pf, last_status);
+		cleanup_and_exit(root, info->env, 1);
+	lpid = fork_left(root, cur, pf, info);
+	rpid = fork_right(root, cur, pf, info);
 	close(pf[0]);
 	close(pf[1]);
 	waitpid(lpid, NULL, 0);
 	waitpid(rpid, &st_right, 0);
-	cleanup_and_exit(root, env, handle_child_status(st_right));
+	cleanup_and_exit(root, info->env, handle_child_status(st_right));
 }

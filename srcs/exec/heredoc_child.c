@@ -55,7 +55,8 @@ static int	hd_line(int p[2], char *line, t_hd *hd)
 	{
 		if (g_sig == 130)
 			return (-1);
-		ft_putstr_fd("minishell: warning: here-document delimited by end-of-file (wanted `", 2);
+		ft_putstr_fd("minishell: warning: here-document delimited ", 2);
+		ft_putstr_fd("by end-of-file (wanted `", 2);
 		ft_putstr_fd(hd->redir->target, 2);
 		ft_putstr_fd("')\n", 2);
 		return (0);
@@ -84,7 +85,11 @@ void	heredoc_child(int p[2], t_hd *hd)
 			if (hd->line)
 				free(hd->line);
 			if (ret == -1)
-				cleanup_and_exit(hd->root, hd->env, g_sig == 130 ? 130 : 1);
+			{
+				if (g_sig == 130)
+					cleanup_and_exit(hd->root, hd->env, 130);
+				cleanup_and_exit(hd->root, hd->env, 1);
+			}
 			cleanup_and_exit(hd->root, hd->env, 0);
 		}
 	}

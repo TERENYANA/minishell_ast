@@ -66,7 +66,7 @@ void	exec_external_cmd(t_node *root, t_node *cur, t_var **env)
 	cleanup_and_exit(root, env, exit_code);
 }
 
-static int	run_subtree(t_node *root, t_node *n, t_var **env, int last_status)
+static int	run_subtree(t_node *root, t_node *n, t_exec_info *info)
 {
 	pid_t	pid;
 	int		wstatus;
@@ -75,18 +75,21 @@ static int	run_subtree(t_node *root, t_node *n, t_var **env, int last_status)
 	if (pid == -1)
 		return (1);
 	if (pid == 0)
-		exec_node_in_child(root, n, env, last_status);
+		exec_node_in_child(root, n, info);
 	waitpid(pid, &wstatus, 0);
 	return (handle_child_status(wstatus));
 }
 
-void	exec_andor_in_child(t_node *root, t_node *cur, t_var **env, int last_status)
+void	exec_andor_in_child(t_node *root, t_node *cur, t_exec_info *info)
 {
 	int	status;
 
-	status = run_subtree(root, cur->left, env, last_status);
+	status = run_subtree(root, cur->left, info);
 	if ((cur->type == N_AND && status == 0)
 		|| (cur->type == N_OR && status != 0))
-		status = run_subtree(root, cur->right, env, status);
-	cleanup_and_exit(root, env, status);
+	{
+		info->last_status = status;
+		status = run_subtree(root, cur->right, info);
+	}
+	cleanup_and_exit(root, info->env, status);
 }

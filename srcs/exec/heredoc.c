@@ -22,18 +22,12 @@ static int	handle_heredoc_status(int status, int p[2], t_redirect *redir)
 	return (0);
 }
 
-static int	process_heredoc(t_redirect *redir, t_var **env, int status_val, t_node *root, char *line)
+static int	process_heredoc(t_hd *hd)
 {
 	int		p[2];
 	pid_t	pid;
 	int		status;
-	t_hd	hd;
 
-	hd.redir = redir;
-	hd.env = env;
-	hd.status = status_val;
-	hd.root = root;
-	hd.line = line;
 	if (pipe(p) == -1)
 		return (-1);
 	ignore_signals();
@@ -41,13 +35,13 @@ static int	process_heredoc(t_redirect *redir, t_var **env, int status_val, t_nod
 	if (pid == -1)
 		return (close(p[0]), close(p[1]), -1);
 	if (pid == 0)
-		heredoc_child(p, &hd);
+		heredoc_child(p, hd);
 	close(p[1]);
 	waitpid(pid, &status, 0);
-	return (handle_heredoc_status(status, p, redir));
+	return (handle_heredoc_status(status, p, hd->redir));
 }
 
-int	process_all_heredocs(t_node *root, t_node *node, t_var **env, int status, char *line)
+int	process_all_heredocs(t_node *node, t_hd *hd)
 {
 	t_redirect	*r;
 
@@ -58,16 +52,20 @@ int	process_all_heredocs(t_node *root, t_node *node, t_var **env, int status, ch
 		r = node->redirect;
 		while (r)
 		{
-			if (r->type == HEREDOC && process_heredoc(r, env, status, root, line) == -1)
-				return (-1);
+			if (r->type == HEREDOC)
+			{
+				hd->redir = r;
+				if (process_heredoc(hd) == -1)
+					return (-1);
+			}
 			r = r->next;
 		}
 		if (node->type == N_CMD)
 			return (0);
 	}
-	if (process_all_heredocs(root, node->left, env, status, line) == -1)
+	if (process_all_heredocs(node->left, hd) == -1)
 		return (-1);
-	return (process_all_heredocs(root, node->right, env, status, line));
+	return (process_all_heredocs(node->right, hd));
 }
 
 void	close_heredoc_fds(t_node *node)

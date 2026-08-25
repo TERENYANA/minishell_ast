@@ -109,6 +109,12 @@ typedef struct s_parse_info
 	int		*error_code;
 }	t_parse_info;
 
+typedef struct s_exec_info
+{
+	t_var	**env;
+	int		last_status;
+}	t_exec_info;
+
 typedef struct s_hd
 {
 	t_redirect	*redir;
@@ -183,11 +189,14 @@ int				handle_child_status(int wstatus);
 void			expand_cmd_args(t_node *cmd_node, t_var *env, int status);
 int				apply_redirections(t_node *node, t_var *env, int status);
 int				fork_and_run(t_node *root, t_var **env, int last_status);
-void			exec_node_in_child(t_node *root, t_node *cur, t_var **env, int last_status);
+void			exec_node_in_child(t_node *root, t_node *cur,
+					t_exec_info *info);
 void			exec_external_cmd(t_node *root, t_node *cur, t_var **env);
-void			exec_pipe_in_child(t_node *root, t_node *cur, t_var **env, int last_status);
-void			exec_andor_in_child(t_node *root, t_node *cur, t_var **env, int last_status);
-int				process_all_heredocs(t_node *root, t_node *node, t_var **env, int status, char *line);
+void			exec_pipe_in_child(t_node *root, t_node *cur,
+					t_exec_info *info);
+void			exec_andor_in_child(t_node *root, t_node *cur,
+					t_exec_info *info);
+int				process_all_heredocs(t_node *node, t_hd *hd);
 void			heredoc_child(int p[2], t_hd *hd);
 void			close_heredoc_fds(t_node *node);
 

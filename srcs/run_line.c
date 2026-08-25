@@ -40,6 +40,7 @@ int	run_line(char *line, t_var **env, int status, int *abort)
 {
 	t_token	*tokens;
 	t_node	*tree;
+	t_hd	hd;
 	int		err;
 
 	err = 0;
@@ -52,7 +53,11 @@ int	run_line(char *line, t_var **env, int status, int *abort)
 	free_token_list(tokens);
 	if (!tree)
 		return (handle_err(err, status, abort));
-	if (process_all_heredocs(tree, tree, env, status, line) == -1)
+	hd.root = tree;
+	hd.env = env;
+	hd.status = status;
+	hd.line = line;
+	if (process_all_heredocs(tree, &hd) == -1)
 		return (heredoc_error(tree, abort));
 	status = run_tree(tree, env, status);
 	close_heredoc_fds(tree);
