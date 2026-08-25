@@ -178,7 +178,7 @@ void			sort_tab(char **tab);
 
 char			*find_cmd_path(char *cmd, t_var *env);
 int				run_tree(t_node *root, t_var **env, int last_status);
-int				run_line(char *line, t_var **env, int status);
+int				run_line(char *line, t_var **env, int status, int *abort);
 int				handle_child_status(int wstatus);
 void			expand_cmd_args(t_node *cmd_node, t_var *env, int status);
 int				apply_redirections(t_node *node, t_var *env, int status);

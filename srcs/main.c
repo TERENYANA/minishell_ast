@@ -65,6 +65,7 @@ static void	init_env_vars(t_var **env)
 static void	main_loop(t_var **env, int *status)
 {
 	char	*line;
+	int		abort;
 
 	while (1)
 	{
@@ -75,8 +76,11 @@ static void	main_loop(t_var **env, int *status)
 		*status = post_readline_status(*status);
 		if (*line && isatty(STDIN_FILENO))
 			add_history(line);
-		*status = run_line(line, env, *status);
+		abort = 0;
+		*status = run_line(line, env, *status, &abort);
 		free(line);
+		if (abort && !isatty(STDIN_FILENO))
+			break ;
 	}
 }
 
