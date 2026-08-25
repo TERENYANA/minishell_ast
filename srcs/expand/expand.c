@@ -23,7 +23,8 @@ static char	*join_free(char *a, char *b)
 	free(b);
 	return (res);
 }
-
+	/* $$ should expand to shell PID, but getpid() is not in the
+	** list of authorized functions — left as literal instead. */
 static char	*expand_dollar(char *s, int *i, t_var *env, int status)
 {
 	int		start;
@@ -34,8 +35,6 @@ static char	*expand_dollar(char *s, int *i, t_var *env, int status)
 	braces = 0;
 	if (s[*i + 1] == '?')
 		return (*i += 2, ft_itoa(status));
-	if (s[*i + 1] == '$')
-		return (*i += 2, ft_strdup("4242"));
 	if (s[*i + 1] == '0')
 		return (*i += 2, ft_strdup("minishell"));
 	if (s[*i + 1] == '{')
