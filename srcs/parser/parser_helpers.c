@@ -49,15 +49,18 @@ int	add_arg(t_node *node, char *value)
 
 int	add_word(t_node *node, t_token *tok, t_parse_info *info)
 {
-	char	*val;
+	char	*expanded;
 
-	(void)info;
 	if (!tok || !tok->value)
 		return (1);
-	val = ft_strdup(tok->value);
-	if (!val)
+	expanded = ft_expand(tok->value, info->env, info->status);
+	if (!expanded)
 		return (0);
-	return (add_arg(node, val));
+	if (expanded[0] == '\0' && !has_quotes(tok->value))
+		return (free(expanded), 1);
+	if (has_unquoted_star(tok->value))
+		return (add_wildcard_args(node, expanded));
+	return (add_arg(node, expanded));
 }
 
 int	is_cmd_end(t_token *t)
