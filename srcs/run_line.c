@@ -19,7 +19,7 @@ static int	err_or(int err, int fallback)
 	return (fallback);
 }
 
-int	run_line(char *line, t_var **env, int status)
+int	run_line(char *line, t_var **env, int status, int *abort)
 {
 	t_token	*tokens;
 	t_node	*tree;
@@ -28,10 +28,15 @@ int	run_line(char *line, t_var **env, int status)
 	err = 0;
 	tokens = tokenize_line(line, &err);
 	if (!tokens)
+	{
+		if (err)
+			*abort = 1;
 		return (err_or(err, status));
+	}
 	if (!syntax_ok(tokens, &err))
 	{
 		free_token_list(tokens);
+		*abort = 1;
 		return (2);
 	}
 	tree = parsing(tokens, *env, status, &err);
@@ -39,6 +44,7 @@ int	run_line(char *line, t_var **env, int status)
 	if (process_all_heredocs(tree, tree, env, status, line) == -1)
 	{
 		ft_free_node(tree);
+		*abort = 1;
 		return (130);
 	}
 	status = run_tree(tree, env, status);

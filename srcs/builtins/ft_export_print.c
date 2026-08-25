@@ -33,9 +33,18 @@ static void	print_sorted(t_var **arr, int n)
 	while (++i < n)
 	{
 		if (arr[i]->value)
-			printf("declare -x %s=\"%s\"\n", arr[i]->name, arr[i]->value);
+		{
+			ft_putstr_fd("declare -x ", STDOUT_FILENO);
+			ft_putstr_fd(arr[i]->name, STDOUT_FILENO);
+			ft_putstr_fd("=\"", STDOUT_FILENO);
+			ft_putstr_fd(arr[i]->value, STDOUT_FILENO);
+			ft_putendl_fd("\"", STDOUT_FILENO);
+		}
 		else
-			printf("declare -x %s\n", arr[i]->name);
+		{
+			ft_putstr_fd("declare -x ", STDOUT_FILENO);
+			ft_putendl_fd(arr[i]->name, STDOUT_FILENO);
+		}
 	}
 }
 
