@@ -15,9 +15,8 @@
 static void	on_signal_heredoc(int signo)
 {
 	(void)signo;
-	g_sig = 130;
 	write(STDOUT_FILENO, "\n", 1);
-	close(STDIN_FILENO);
+	exit(130);
 }
 
 void	setup_heredoc_signals(void)
