@@ -12,6 +12,16 @@
 
 #include "../minishell.h"
 
+static int	handle_heredoc_status(int status, int p[2], t_redirect *redir)
+{
+	setup_signal_handlers();
+	if ((WIFSIGNALED(status) && WTERMSIG(status) == SIGINT)
+		|| (WIFEXITED(status) && WEXITSTATUS(status) == 130))
+		return (g_sig = SIGINT, close(p[0]), -1);
+	redir->heredoc_fd = p[0];
+	return (0);
+}
+
 static int	process_heredoc(t_redirect *redir, t_var **env, int status_val, t_node *root, char *line)
 {
 	int		p[2];
@@ -34,12 +44,7 @@ static int	process_heredoc(t_redirect *redir, t_var **env, int status_val, t_nod
 		heredoc_child(p, &hd);
 	close(p[1]);
 	waitpid(pid, &status, 0);
-	setup_signal_handlers();
-	if ((WIFSIGNALED(status) && WTERMSIG(status) == SIGINT)
-		|| (WIFEXITED(status) && WEXITSTATUS(status) == 130))
-		return (g_sig = SIGINT, close(p[0]), -1);
-	redir->heredoc_fd = p[0];
-	return (0);
+	return (handle_heredoc_status(status, p, redir));
 }
 
 int	process_all_heredocs(t_node *root, t_node *node, t_var **env, int status, char *line)

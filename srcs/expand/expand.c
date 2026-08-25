@@ -25,6 +25,34 @@ static char	*join_free(char *a, char *b)
 }
 	/* $$ should expand to shell PID, but getpid() is not in the
 	** list of authorized functions — left as literal instead. */
+static char	*expand_special(char *s, int *i, int status, int *braces)
+{
+	*braces = 0;
+	if (s[*i + 1] == '?')
+		return (*i += 2, ft_itoa(status));
+	if (s[*i + 1] == '0')
+		return (*i += 2, ft_strdup("minishell"));
+	if (s[*i + 1] == '{')
+	{
+		*braces = 1;
+		(*i)++;
+	}
+	if (ft_isdigit(s[*i + 1]))
+	{
+		*i += 2;
+		if (*braces && s[*i] == '}')
+			(*i)++;
+		return (ft_strdup(""));
+	}
+	if (!s[*i + 1] || (!ft_isalpha(s[*i + 1]) && s[*i + 1] != '_'))
+	{
+		if (*braces)
+			return ((*i)++, ft_strdup("${"));
+		return ((*i)++, ft_strdup("$"));
+	}
+	return (NULL);
+}
+
 static char	*expand_dollar(char *s, int *i, t_var *env, int status)
 {
 	int		start;
@@ -32,29 +60,9 @@ static char	*expand_dollar(char *s, int *i, t_var *env, int status)
 	char	*val;
 	int		braces;
 
-	braces = 0;
-	if (s[*i + 1] == '?')
-		return (*i += 2, ft_itoa(status));
-	if (s[*i + 1] == '0')
-		return (*i += 2, ft_strdup("minishell"));
-	if (s[*i + 1] == '{')
-	{
-		braces = 1;
-		(*i)++;
-	}
-	if (ft_isdigit(s[*i + 1]))
-	{
-		*i += 2;
-		if (braces && s[*i] == '}')
-			(*i)++;
-		return (ft_strdup(""));
-	}
-	if (!s[*i + 1] || (!ft_isalpha(s[*i + 1]) && s[*i + 1] != '_'))
-	{
-		if (braces)
-			return ((*i)++, ft_strdup("${"));
-		return ((*i)++, ft_strdup("$"));
-	}
+	val = expand_special(s, i, status, &braces);
+	if (val)
+		return (val);
 	start = ++(*i);
 	while (s[*i] && (ft_isalnum(s[*i]) || s[*i] == '_'))
 		(*i)++;
@@ -91,24 +99,6 @@ static char	*expand_step(char *s, int *i, t_qstate *q)
 		return (ft_strdup(""));
 	}
 	return (NULL);
-}
-
-char	*append_char(char *res, char c)
-{
-	int		len;
-	char	*new;
-
-	if (!res)
-		return (NULL);
-	len = ft_strlen(res);
-	new = malloc(len + 2);
-	if (!new)
-		return (free(res), NULL);
-	ft_memcpy(new, res, len);
-	new[len] = c;
-	new[len + 1] = '\0';
-	free(res);
-	return (new);
 }
 
 char	*ft_expand(char *s, t_var *env, int status)

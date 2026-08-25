@@ -37,6 +37,16 @@ void	expand_cmd_args(t_node *cmd_node, t_var *env, int status)
 	ft_free_tab(old_cmd);
 }
 
+static int	execute_parent_builtin(t_node *node, t_var **env, int last_status)
+{
+	expand_cmd_args(node, *env, last_status);
+	if (apply_redirections(node, *env, last_status) != 0)
+		return (1);
+	if (!node->cmd || !node->cmd[0])
+		return (0);
+	return (dispatch_builtin(node, env, last_status));
+}
+
 static int	run_builtin_in_parent(t_node *node, t_var **env, int last_status)
 {
 	int	saved_in;
@@ -53,16 +63,7 @@ static int	run_builtin_in_parent(t_node *node, t_var **env, int last_status)
 			close(saved_out);
 		return (1);
 	}
-	expand_cmd_args(node, *env, last_status);
-	if (apply_redirections(node, *env, last_status) != 0)
-		ret = 1;
-	else
-	{
-		if (!node->cmd || !node->cmd[0])
-			ret = 0;
-		else
-			ret = dispatch_builtin(node, env, last_status);
-	}
+	ret = execute_parent_builtin(node, env, last_status);
 	dup2(saved_in, STDIN_FILENO);
 	dup2(saved_out, STDOUT_FILENO);
 	close(saved_in);
@@ -77,13 +78,6 @@ static int	is_parent_builtin_root(t_node *root)
 		&& is_builtin(root->cmd[0]));
 }
 
-static int	need_right(t_node_type t, int status)
-{
-	if (t == N_AND)
-		return (status == 0);
-	return (status != 0);
-}
-
 int	run_tree(t_node *root, t_var **env, int last_status)
 {
 	int	status;
@@ -91,7 +85,8 @@ int	run_tree(t_node *root, t_var **env, int last_status)
 	if (root->type == N_AND || root->type == N_OR)
 	{
 		status = run_tree(root->left, env, last_status);
-		if (need_right(root->type, status))
+		if ((root->type == N_AND && status == 0)
+			|| (root->type == N_OR && status != 0))
 			status = run_tree(root->right, env, status);
 		return (status);
 	}

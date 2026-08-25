@@ -23,57 +23,63 @@ static int	visible_match(const char *pat, const char *name)
 	return (wc_match(pat, name));
 }
 
-char	**collect_matches(const char *pattern)
+static char	**read_and_match(DIR *dir, char *d_p, char *f_p, char **tab)
 {
-	DIR				*dir;
 	struct dirent	*e;
-	char			**tab;
-	char			*dir_path;
-	char			*file_pat;
-	char			*last_slash;
-	char			*full_match;
-
-	tab = ft_calloc(1, sizeof(char *));
-	if (!tab)
-		return (NULL);
-
-	last_slash = ft_strrchr(pattern, '/');
-	if (last_slash)
-	{
-		dir_path = ft_substr(pattern, 0, last_slash - pattern + 1);
-		file_pat = last_slash + 1;
-	}
-	else
-	{
-		dir_path = ft_strdup(".");
-		file_pat = (char *)pattern;
-	}
-
-	dir = opendir(dir_path);
-	if (!dir)
-		return (free(dir_path), tab);
+	char			*full;
 
 	e = readdir(dir);
 	while (e)
 	{
-		if (visible_match(file_pat, e->d_name))
+		if (visible_match(f_p, e->d_name))
 		{
-			if (last_slash)
-				full_match = ft_strjoin(dir_path, e->d_name);
+			if (d_p)
+				full = ft_strjoin(d_p, e->d_name);
 			else
-				full_match = ft_strdup(e->d_name);
-			if (!full_match || !tab_push(&tab, full_match))
-			{
-				free(full_match);
-				free(dir_path);
-				closedir(dir);
-				ft_free_tab(tab);
-				return (NULL);
-			}
-			free(full_match);
+				full = ft_strdup(e->d_name);
+			if (!full || !tab_push(&tab, full))
+				return (free(full), ft_free_tab(tab), NULL);
+			free(full);
 		}
 		e = readdir(dir);
 	}
+	return (tab);
+}
+
+static DIR	*init_match(const char *pat, char **d_p, char **f_p, char **ls)
+{
+	*ls = ft_strrchr(pat, '/');
+	if (*ls)
+	{
+		*d_p = ft_substr(pat, 0, *ls - pat + 1);
+		*f_p = *ls + 1;
+	}
+	else
+	{
+		*d_p = ft_strdup(".");
+		*f_p = (char *)pat;
+	}
+	return (opendir(*d_p));
+}
+
+char	**collect_matches(const char *pattern)
+{
+	DIR		*dir;
+	char	*dir_path;
+	char	*file_pat;
+	char	*last_slash;
+	char	**tab;
+
+	tab = ft_calloc(1, sizeof(char *));
+	if (!tab)
+		return (NULL);
+	dir = init_match(pattern, &dir_path, &file_pat, &last_slash);
+	if (!dir)
+		return (free(dir_path), tab);
+	if (!last_slash)
+		tab = read_and_match(dir, NULL, file_pat, tab);
+	else
+		tab = read_and_match(dir, dir_path, file_pat, tab);
 	free(dir_path);
 	closedir(dir);
 	return (tab);

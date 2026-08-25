@@ -35,31 +35,44 @@ static int	perror_redir(const char *target)
 	return (1);
 }
 
+static int	ambiguous_redir_error(const char *target, char *exp, char **m)
+{
+	ft_putstr_fd("minishell: ", 2);
+	ft_putstr_fd((char *)target, 2);
+	ft_putendl_fd(": ambiguous redirect", 2);
+	if (exp)
+		free(exp);
+	if (m)
+		ft_free_tab(m);
+	return (1);
+}
+
+static int	process_target(t_redirect *r, t_var *env, int status)
+{
+	char	*exp;
+
+	if (r->type == HEREDOC)
+		return (0);
+	exp = ft_expand(r->target, env, status);
+	if (!exp || (exp[0] == '\0' && !has_quotes(r->target)))
+		return (ambiguous_redir_error(r->target, exp, NULL));
+	free(r->target);
+	r->target = exp;
+	return (0);
+}
+
 int	apply_redirections(t_node *cmd_node, t_var *env, int status)
 {
 	t_redirect	*r;
 	int			fd;
-	char		*expanded;
 
 	if (!cmd_node)
 		return (0);
 	r = cmd_node->redirect;
 	while (r)
 	{
-		if (r->type != HEREDOC)
-		{
-			expanded = ft_expand(r->target, env, status);
-			if (!expanded || (expanded[0] == '\0' && !has_quotes(r->target)))
-			{
-				ft_putstr_fd("minishell: ", 2);
-				ft_putstr_fd(r->target, 2);
-				ft_putendl_fd(": ambiguous redirect", 2);
-				free(expanded);
-				return (1);
-			}
-			free(r->target);
-			r->target = expanded;
-		}
+		if (process_target(r, env, status) != 0)
+			return (1);
 		fd = open_redir(r);
 		if (fd < 0)
 			return (perror_redir(r->target));
