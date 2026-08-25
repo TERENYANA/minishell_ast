@@ -40,35 +40,12 @@ static int	setup_heredoc(t_redirect *r, t_token *target, t_parse_info *info)
 static int	setup_file_target(t_redirect *r, t_token *target,
 		t_parse_info *info)
 {
-	char	**matches;
-
+	(void)info;
 	r->expand_heredoc = 0;
 	r->heredoc_fd = -1;
-	r->target = ft_expand(target->value, info->env, info->status);
+	r->target = ft_strdup(target->value);
 	if (!r->target)
 		return (0);
-	if (r->target[0] == '\0' && !has_quotes(target->value))
-	{
-		ft_putstr_fd("minishell: ", 2);
-		ft_putstr_fd(target->value, 2);
-		ft_putendl_fd(": ambiguous redirect", 2);
-		return (0);
-	}
-	if (has_unquoted_star(target->value))
-	{
-		matches = collect_matches(r->target);
-		if (!matches || !matches[0] || matches[1])
-		{
-			ft_putstr_fd("minishell: ", 2);
-			ft_putstr_fd(target->value, 2);
-			ft_putendl_fd(": ambiguous redirect", 2);
-			ft_free_tab(matches);
-			return (0);
-		}
-		free(r->target);
-		r->target = ft_strdup(matches[0]);
-		ft_free_tab(matches);
-	}
 	return (1);
 }
 
