@@ -12,11 +12,28 @@
 
 #include "./minishell.h"
 
-static int	err_or(int err, int fallback)
+static int	handle_err(int err, int status, int *abort)
 {
 	if (err)
+	{
+		*abort = 1;
 		return (err);
-	return (fallback);
+	}
+	return (status);
+}
+
+static int	syntax_error(t_token *tokens, int *abort)
+{
+	free_token_list(tokens);
+	*abort = 1;
+	return (2);
+}
+
+static int	heredoc_error(t_node *tree, int *abort)
+{
+	ft_free_node(tree);
+	*abort = 1;
+	return (130);
 }
 
 int	run_line(char *line, t_var **env, int status, int *abort)
@@ -28,25 +45,15 @@ int	run_line(char *line, t_var **env, int status, int *abort)
 	err = 0;
 	tokens = tokenize_line(line, &err);
 	if (!tokens)
-	{
-		if (err)
-			*abort = 1;
-		return (err_or(err, status));
-	}
+		return (handle_err(err, status, abort));
 	if (!syntax_ok(tokens, &err))
-	{
-		free_token_list(tokens);
-		*abort = 1;
-		return (2);
-	}
+		return (syntax_error(tokens, abort));
 	tree = parsing(tokens, *env, status, &err);
 	free_token_list(tokens);
+	if (!tree)
+		return (handle_err(err, status, abort));
 	if (process_all_heredocs(tree, tree, env, status, line) == -1)
-	{
-		ft_free_node(tree);
-		*abort = 1;
-		return (130);
-	}
+		return (heredoc_error(tree, abort));
 	status = run_tree(tree, env, status);
 	close_heredoc_fds(tree);
 	ft_free_node(tree);
