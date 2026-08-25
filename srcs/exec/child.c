@@ -19,6 +19,7 @@ static void	exec_cmd_in_child(t_node *root, t_node *cur, t_var **env, int last_s
 	expand_cmd_args(cur, *env, last_status);
 	if (apply_redirections(cur, *env, last_status) != 0)
 		cleanup_and_exit(root, env, 1);
+	close_heredoc_fds(root);
 	if (!cur->cmd || !cur->cmd[0])
 		cleanup_and_exit(root, env, 0);
 	if (is_builtin(cur->cmd[0]))
@@ -36,13 +37,13 @@ static void	exec_sub_in_child(t_node *root, t_node *cur, t_var **env, int last_s
 {
 	if (apply_redirections(cur, *env, last_status) != 0)
 		cleanup_and_exit(root, env, 1);
+	close_heredoc_fds(root);
 	exec_node_in_child(root, cur->left, env, last_status);
 }
 
 void	exec_node_in_child(t_node *root, t_node *cur, t_var **env, int last_status)
 {
 	setup_child_signals();
-	close_heredoc_fds(root);
 	if (cur->type == N_CMD)
 		exec_cmd_in_child(root, cur, env, last_status);
 	else if (cur->type == N_SUB)
