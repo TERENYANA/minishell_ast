@@ -25,6 +25,7 @@ static void	run_right(t_node *root, t_node *cur, t_var **env, int pf[2], int las
 	close(pf[1]);
 	dup2(pf[0], STDIN_FILENO);
 	close(pf[0]);
+	close_heredoc_fds(root);
 	exec_node_in_child(root, cur->right, env, last_status);
 }
 
