@@ -42,6 +42,7 @@ static void	exec_sub_in_child(t_node *root, t_node *cur, t_var **env, int last_s
 void	exec_node_in_child(t_node *root, t_node *cur, t_var **env, int last_status)
 {
 	setup_child_signals();
+	close_heredoc_fds(root);
 	if (cur->type == N_CMD)
 		exec_cmd_in_child(root, cur, env, last_status);
 	else if (cur->type == N_SUB)
