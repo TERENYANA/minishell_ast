@@ -10,7 +10,7 @@
 /*                                                                            */
 /* ************************************************************************** */
 
-#include "../minishell.h"
+#include "minishell.h"
 
 static void	exec_cmd_in_child(t_node *root, t_node *cur, t_exec_info *info)
 {

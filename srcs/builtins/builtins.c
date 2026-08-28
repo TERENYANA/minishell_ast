@@ -3,14 +3,14 @@
 /*                                                        :::      ::::::::   */
 /*   builtins.c                                         :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: yyuskiv <yyuskiv@learner.42.tech>          +#+  +:+       +#+        */
+/*   By: masolet- <masolet-@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/08/18 15:34:38 by yyuskiv           #+#    #+#             */
-/*   Updated: 2026/08/18 15:34:40 by yyuskiv          ###   ########.fr       */
+/*   Updated: 2026/08/28 13:09:36 by masolet-         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#include "../minishell.h"
+#include "minishell.h"
 
 int	is_builtin(char *cmd_name)
 {

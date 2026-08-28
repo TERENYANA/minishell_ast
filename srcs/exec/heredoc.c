@@ -10,7 +10,7 @@
 /*                                                                            */
 /* ************************************************************************** */
 
-#include "../minishell.h"
+#include "minishell.h"
 
 static int	handle_heredoc_status(int status, int p[2], t_redirect *redir)
 {

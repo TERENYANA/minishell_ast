@@ -10,7 +10,7 @@
 /*                                                                            */
 /* ************************************************************************** */
 
-#include "../minishell.h"
+#include "minishell.h"
 
 static int	cmd_step(t_node *node, t_token **cur, t_parse_info *info)
 {

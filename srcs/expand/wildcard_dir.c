@@ -10,7 +10,7 @@
 /*                                                                            */
 /* ************************************************************************** */
 
-#include "../minishell.h"
+#include "minishell.h"
 #include <dirent.h>
 
 static int	visible_match(const char *pat, const char *name)

@@ -10,7 +10,7 @@
 /*                                                                            */
 /* ************************************************************************** */
 
-#include "../minishell.h"
+#include "minishell.h"
 
 static void	run_left(t_node *root, t_node *cur, int pf[2], t_exec_info *info)
 {
