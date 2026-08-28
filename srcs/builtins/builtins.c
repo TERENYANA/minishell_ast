@@ -18,10 +18,15 @@ int	is_builtin(char *cmd_name)
 		return (0);
 	if (ft_strcmp(cmd_name, "echo") == 0 || ft_strcmp(cmd_name, "cd") == 0
 		|| ft_strcmp(cmd_name, "pwd") == 0 || ft_strcmp(cmd_name, "export") == 0
-		|| ft_strcmp(cmd_name, "unset") == 0 || ft_strcmp(cmd_name, "env") == 0
+		|| ft_strcmp(cmd_name, "unset") == 0
 		|| ft_strcmp(cmd_name, "exit") == 0 || ft_strcmp(cmd_name, ":") == 0)
 		return (1);
 	return (0);
+}
+
+int	is_env_builtin(char **cmd)
+{
+	return (cmd && cmd[0] && ft_strcmp(cmd[0], "env") == 0 && !cmd[1]);
 }
 
 int	dispatch_builtin(t_node *node, t_var **env_list, int last_status)

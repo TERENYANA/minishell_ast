@@ -12,14 +12,20 @@
 
 #include "minishell.h"
 
-static char	*cd_home(t_var *env)
+static char	*cd_home(t_var *env, int *no_op)
 {
 	char	*path;
 
+	*no_op = 0;
 	path = get_env_value("HOME", env);
-	if (!path || !*path)
+	if (!path)
 	{
 		ft_putstr_fd("minishell: cd: HOME not set\n", 2);
+		return (NULL);
+	}
+	if (!*path)
+	{
+		*no_op = 1;
 		return (NULL);
 	}
 	return (path);
@@ -39,11 +45,13 @@ static char	*cd_oldpwd(t_var *env, int *should_print)
 	return (path);
 }
 
-static char	*get_target_path(char **args, t_var *env, int *should_print)
+static char	*get_target_path(char **args, t_var *env, int *should_print,
+		int *no_op)
 {
 	*should_print = 0;
+	*no_op = 0;
 	if (!args[1] || ft_strcmp(args[1], "~") == 0)
-		return (cd_home(env));
+		return (cd_home(env, no_op));
 	if (ft_strcmp(args[1], "-") == 0)
 		return (cd_oldpwd(env, should_print));
 	return (args[1]);
@@ -71,6 +79,7 @@ int	ft_cd(char **args, t_var **env_list)
 	char	*target_path;
 	char	*old_pwd;
 	int		should_print;
+	int		no_op;
 
 	if (args[1] && args[2])
 	{
@@ -79,7 +88,9 @@ int	ft_cd(char **args, t_var **env_list)
 	}
 	if (args[1] && args[1][0] == '\0')
 		return (0);
-	target_path = get_target_path(args, *env_list, &should_print);
+	target_path = get_target_path(args, *env_list, &should_print, &no_op);
+	if (no_op)
+		return (0);
 	if (!target_path)
 		return (1);
 	old_pwd = getcwd(NULL, 0);

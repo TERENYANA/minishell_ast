@@ -37,17 +37,25 @@ void	err_export(char *name)
 	ft_putstr_fd("': not a valid identifier\n", 2);
 }
 
-int	parse_export_arg(char *arg, char **name, char **value)
+int	parse_export_arg(char *arg, char **name, char **value, int *is_append)
 {
 	char	*equal_pos;
+	int		name_len;
 
 	if (!arg)
 		return (1);
+	*is_append = 0;
 	equal_pos = ft_strchr(arg, '=');
+	name_len = equal_pos ? equal_pos - arg : (int)ft_strlen(arg);
+	if (equal_pos && name_len > 0 && arg[name_len - 1] == '+')
+	{
+		*is_append = 1;
+		name_len--;
+	}
 	if (!equal_pos)
 		*name = ft_strdup(arg);
 	else
-		*name = ft_substr(arg, 0, equal_pos - arg);
+		*name = ft_substr(arg, 0, name_len);
 	if (!*name)
 		return (1);
 	*value = NULL;
