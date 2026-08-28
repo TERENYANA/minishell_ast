@@ -75,7 +75,7 @@ int	ft_cd(char **args, t_var **env_list)
 	if (args[1] && args[2])
 	{
 		ft_putstr_fd("minishell: cd: too many arguments\n", 2);
-		return (1);
+		return (2);
 	}
 	if (args[1] && args[1][0] == '\0')
 		return (0);
