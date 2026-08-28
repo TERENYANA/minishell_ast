@@ -190,7 +190,7 @@ static void	main_loop(t_var **env, int *status)
  ** loop, then cleans up properly (history, env, get_next_line) before
  ** returning the last status.
  */
-int	main(int argc, char **argv, char **envp)
+int	main(int ac, char **av, char **envp)
 {
 	t_var	*env;
 	int		status;
