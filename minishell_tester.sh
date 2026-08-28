@@ -328,7 +328,7 @@ bonus_wildcards=(
 )
 
 # ============================================================================
-# SANDBOX + RUNNERS (same as before)
+# SANDBOX + RUNNERS
 # ============================================================================
 WORK=$(mktemp -d /tmp/ms_test.XXXXXX)
 trap 'rm -rf "$WORK"' EXIT
@@ -350,6 +350,14 @@ TOTAL_PASS=0
 TOTAL_FAIL=0
 TOTAL_LEAK=0
 TOTAL_FDLEAK=0
+
+# Names of environment variables that are inherently volatile from one
+# process invocation to the next (session/PID/cgroup-specific, or shell
+# bookkeeping vars like '_' / SHLVL that legitimately differ between two
+# independently-launched processes). These must never count as a real
+# diff between bash and minishell output, in EITHER `env` format
+# (NAME=value) or `export`/`declare -x` format (declare -x NAME="value").
+VOLATILE_VARS="PWD|OLDPWD|SHLVL|_|LINES|COLUMNS|SHELL|JOURNAL_STREAM|INVOCATION_ID|MANAGERPID|MANAGERPIDFDID|SYSTEMD_EXEC_PID|MEMORY_PRESSURE_WATCH|MEMORY_PRESSURE_WRITE|XDG_SESSION_ID|DBUS_SESSION_BUS_ADDRESS|SSH_AUTH_SOCK|WINDOWID|VSCODE_NONCE|TERM_SESSION_ID"
 
 run_correctness() {
     local name="$1"; shift
@@ -390,7 +398,11 @@ run_correctness() {
         ( cd "$Mdir" && printf '%s' "$feed" | timeout 5 "$MS" >/dev/null 2>&1 )
 
         local norm='s#/tmp/ms_test\.[^/]*/[bm]_[a-z_]*_[0-9]*#SANDBOX#g'
-        local filt='^(PWD=|OLDPWD=|SHLVL=|_=|LINES=|COLUMNS=|SHELL=)'
+        # Filters both `env` output (NAME=value) and `export`/`declare -x`
+        # output (declare -x NAME="value" or declare -x NAME) for every
+        # volatile var, so a real diff never hides behind session noise
+        # and session noise never masquerades as a real diff.
+        local filt="^(${VOLATILE_VARS})=|^declare -x (${VOLATILE_VARS})(=|\$)"
         bout=$(printf '%s\n' "$bout" | sed -E "$norm" | grep -vE "$filt")
         mout=$(printf '%s\n' "$mout" | sed -E "$norm" | grep -vE "$filt")
 
@@ -415,8 +427,18 @@ run_correctness() {
             printf "${R}[KO]${N} %2d: %s\n" "$i" "$t"
             printf "  ${DIM}diff:${N} %s\n" "$diffs"
             if [[ "$diffs" == *stdout* ]] || [ "$VERBOSE" -eq 1 ]; then
-                printf "  ${DIM}bash:${N} [%s]\n" "$(printf '%s' "$bout" | head -5 | tr '\n' '|')"
-                printf "  ${DIM}mini:${N} [%s]\n" "$(printf '%s' "$mout" | head -5 | tr '\n' '|')"
+                if [ "$VERBOSE" -eq 1 ]; then
+                    printf "  ${DIM}bash (full):${N}\n"
+                    printf '%s\n' "$bout" | sed 's/^/    /'
+                    printf "  ${DIM}mini (full):${N}\n"
+                    printf '%s\n' "$mout" | sed 's/^/    /'
+                    printf "  ${DIM}unified diff:${N}\n"
+                    diff <(printf '%s\n' "$bout") <(printf '%s\n' "$mout") | sed 's/^/    /'
+                else
+                    printf "  ${DIM}bash:${N} [%s]\n" "$(printf '%s' "$bout" | head -5 | tr '\n' '|')"
+                    printf "  ${DIM}mini:${N} [%s]\n" "$(printf '%s' "$mout" | head -5 | tr '\n' '|')"
+                    printf "  ${DIM}(rerun with -v for full diff)${N}\n"
+                fi
             fi
             fail=$((fail + 1))
         fi
@@ -470,6 +492,10 @@ run_leaks() {
             [[ "$bad" == *leak* ]] && leak=$((leak + 1))
             [[ "$bad" == *fd* ]] && fdleak=$((fdleak + 1))
             [ "$VERBOSE" -eq 1 ] && [ -n "$lost" ] && echo "$lost" | sed 's/^/    /'
+            if [ "$VERBOSE" -eq 1 ] && [ -n "$fds" ]; then
+                printf "  ${DIM}open fds at exit:${N} %s\n" "$fds"
+                grep -A "${fds%% *}" "FILE DESCRIPTORS" "$log" 2>/dev/null | sed 's/^/    /'
+            fi
         fi
     done
 
@@ -1634,4 +1660,3 @@ echo -e "${B}══════════════════════�
 
 [ "$TOTAL_FAIL" -gt 0 ] || [ "$TOTAL_LEAK" -gt 0 ] || [ "$TOTAL_FDLEAK" -gt 0 ] && exit 1
 exit 0
-make a better tester that will check also for leaks, closed fds, and more cases

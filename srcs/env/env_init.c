@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   env_init.c                                         :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: masolet- <masolet-@student.42.fr>          +#+  +:+       +#+        */
+/*   By: yyuskiv <yyuskiv@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/08/18 15:39:07 by yyuskiv           #+#    #+#             */
-/*   Updated: 2026/08/28 14:14:35 by masolet-         ###   ########.fr       */
+/*   Updated: 2026/08/28 18:54:09 by yyuskiv          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -62,6 +62,11 @@ t_var	*create_env(char **envp)
 	i = 0;
 	while (envp && envp[i])
 	{
+		if (ft_strncmp(envp[i], "_=", 2) == 0)
+		{
+			i++;
+			continue ;
+		}
 		node = new_var(envp[i]);
 		if (!node)
 			return (ft_free_env(head), NULL);
