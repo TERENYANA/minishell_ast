@@ -64,9 +64,8 @@ static int	update_pwd(t_var **env_list, char *old_pwd)
 	current_pwd = getcwd(NULL, 0);
 	if (!current_pwd)
 	{
-		perror("minishell: cd: getcwd");
 		free(old_pwd);
-		return (1);
+		return (0);
 	}
 	if (old_pwd)
 		env_set(env_list, "OLDPWD", old_pwd);

@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   env_init.c                                         :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: masolet- <masolet-@student.42.fr>          +#+  +:+       +#+        */
+/*   By: yyuskiv <yyuskiv@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/08/18 15:39:07 by yyuskiv           #+#    #+#             */
-/*   Updated: 2026/08/28 14:14:35 by masolet-         ###   ########.fr       */
+/*   Updated: 2026/08/28 19:10:15 by yyuskiv          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -49,7 +49,6 @@ static void	append_var(t_var **head, t_var **tail, t_var *node)
 	(*tail)->next = node;
 	*tail = node;
 }
-
 t_var	*create_env(char **envp)
 {
 	t_var	*head;

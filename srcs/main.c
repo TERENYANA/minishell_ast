@@ -9,7 +9,6 @@
 /*   Updated: 2026/08/28 14:12:21 by masolet-         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
-
 #include "minishell.h"
 
 static int	post_readline_status(int prev)
@@ -138,8 +137,9 @@ static char	*read_input(void)
 /*
  ** Initializes the environment variables managed by the shell itself
  ** (as opposed to those inherited as-is from envp): SHLVL incremented,
- ** OLDPWD created empty if absent, and '_' set the way a real exec
- ** would leave it.
+ ** OLDPWD created empty if absent. '_' is left as inherited from envp
+ ** (that's what a real exec would have set it to) and is only updated
+ ** later, when this shell itself execve's an external command.
  */
 static void	init_env_vars(t_var **env)
 {
@@ -155,7 +155,6 @@ static void	init_env_vars(t_var **env)
 	env_set(env, "SHLVL", shlvl_str);
 	if (!find_var(*env, "OLDPWD"))
 		env_set(env, "OLDPWD", NULL);
-	env_set(env, "_", ft_strdup("/usr/bin/env"));
 }
 
 /*

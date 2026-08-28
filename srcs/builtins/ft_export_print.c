@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   ft_export_print.c                                  :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: masolet- <masolet-@student.42.fr>          +#+  +:+       +#+        */
+/*   By: yyuskiv <yyuskiv@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/08/18 15:36:44 by yyuskiv           #+#    #+#             */
-/*   Updated: 2026/08/28 14:14:57 by masolet-         ###   ########.fr       */
+/*   Updated: 2026/08/28 19:11:08 by yyuskiv          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -19,7 +19,8 @@ static int	count_vars(t_var *env)
 	n = 0;
 	while (env)
 	{
-		n++;
+		if (ft_strcmp(env->name, "_") != 0)
+			n++;
 		env = env->next;
 	}
 	return (n);
@@ -63,7 +64,8 @@ int	print_export(t_var *env)
 	i = 0;
 	while (env)
 	{
-		arr[i++] = env;
+		if (ft_strcmp(env->name, "_") != 0)
+			arr[i++] = env;
 		env = env->next;
 	}
 	sort_ptrs(arr, n);
