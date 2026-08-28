@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   builtins.c                                         :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: masolet- <masolet-@student.42.fr>          +#+  +:+       +#+        */
+/*   By: yyuskiv <yyuskiv@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/08/18 15:34:38 by yyuskiv           #+#    #+#             */
-/*   Updated: 2026/08/28 14:14:40 by masolet-         ###   ########.fr       */
+/*   Updated: 2026/08/28 19:18:44 by yyuskiv          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -43,7 +43,7 @@ int	dispatch_builtin(t_node *node, t_var **env_list, int last_status)
 	if (ft_strcmp(name, "echo") == 0)
 		return (ft_echo(args));
 	if (ft_strcmp(name, "pwd") == 0)
-		return (ft_pwd(args));
+		return (ft_pwd(args, *env_list));
 	if (ft_strcmp(name, "env") == 0)
 		return (ft_env(*env_list));
 	if (ft_strcmp(name, "export") == 0)

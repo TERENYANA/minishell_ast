@@ -206,7 +206,7 @@ int				is_env_builtin(char **cmd);
 int				dispatch_builtin(t_node *node, t_var **env_list,
 					int last_status);
 int				ft_echo(char **args);
-int				ft_pwd(char **args);
+int				ft_pwd(char **args, t_var *env);
 int				ft_env(t_var *env);
 int				ft_export(char **args, t_var **env_list);
 int				ft_cd(char **args, t_var **env_list);
