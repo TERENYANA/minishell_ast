@@ -10,7 +10,7 @@
 /*                                                                            */
 /* ************************************************************************** */
 
-#include "../minishell.h"
+#include "minishell.h"
 
 static t_node	*wrap_sub(t_node *inner, t_token **cur, t_parse_info *info)
 {

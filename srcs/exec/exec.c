@@ -10,7 +10,7 @@
 /*                                                                            */
 /* ************************************************************************** */
 
-#include "../minishell.h"
+#include "minishell.h"
 
 void	expand_cmd_args(t_node *cmd_node, t_var *env, int status)
 {

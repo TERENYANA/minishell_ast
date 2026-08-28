@@ -10,7 +10,7 @@
 /*                                                                            */
 /* ************************************************************************** */
 
-#include "../minishell.h"
+#include "minishell.h"
 
 static t_node	*list_rhs(t_node *left, t_token **cur, t_parse_info *info)
 {

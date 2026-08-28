@@ -10,7 +10,7 @@
 /*                                                                            */
 /* ************************************************************************** */
 
-#include "../minishell.h"
+#include "minishell.h"
 
 t_node	*syntax_err_node(t_node *node, t_parse_info *info)
 {
