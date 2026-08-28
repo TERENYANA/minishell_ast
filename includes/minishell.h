@@ -27,6 +27,7 @@
 # include <stdbool.h>
 # include <readline/readline.h>
 # include <readline/history.h>
+# include <dirent.h>
 # include "libft.h"
 
 void			rl_replace_line(const char *text, int clear_undo);

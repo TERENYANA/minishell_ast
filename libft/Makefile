@@ -45,3 +45,5 @@ fclean: clean
 	@printf "✅ ${GREEN}[CLEANED🧹]${WHITE}\n"
 
 re: fclean all
+
+.PHONY: all clean fclean re

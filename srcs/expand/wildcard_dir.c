@@ -3,15 +3,14 @@
 /*                                                        :::      ::::::::   */
 /*   wildcard_dir.c                                     :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: yyuskiv <yyuskiv@learner.42.tech>          +#+  +:+       +#+        */
+/*   By: masolet- <masolet-@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2026/08/18 15:49:05 by yyuskiv           #+#    #+#             */
-/*   Updated: 2026/08/18 15:49:07 by yyuskiv          ###   ########.fr       */
+/*   Created: 2026/08/28 14:13:17 by masolet-          #+#    #+#             */
+/*   Updated: 2026/08/28 14:13:17 by masolet-         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "minishell.h"
-#include <dirent.h>
 
 static int	visible_match(const char *pat, const char *name)
 {

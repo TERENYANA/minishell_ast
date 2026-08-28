@@ -10,7 +10,7 @@ In this project, we implemented a custom shell that supports basic features foun
 ## Instructions
 
 ### Prerequisites
-- A UNIX-like operating system (Linux or macOS)
+- A UNIX-like operating system (Linux)
 - GCC or Clang compiler
 - `make` utility
 - `readline` library installed on your system
@@ -55,5 +55,6 @@ minishell$ exit
 
 ### Use of AI
 - **Debugging**: Assisting in tracking down memory leaks (using valgrind output) and resolving edge cases in string parsing.
-- **Refactoring**: Providing suggestions on structuring the Abstract Syntax Tree (AST) logic and organizing the codebase to adhere to the 42 Norm.
+- **Refactoring**: Providing suggestions on structuring the Abstract Syntax Tree (AST) logic and organizing the codebase to adhere to norminette.
+- **README**: Assisting to write and translate this file.
 
