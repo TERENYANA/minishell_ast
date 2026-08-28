@@ -104,7 +104,7 @@ static int	run_cmd_direct(t_node *root, t_node *n, t_exec_info *info)
 		return (1);
 	if (!n->cmd || !n->cmd[0])
 		return (0);
-	if (!is_builtin(n->cmd[0]))
+	if (!is_builtin(n->cmd[0]) && !is_env_builtin(n->cmd))
 		return (run_subtree(root, n, info));
 	if (ft_strcmp(n->cmd[0], "exit") == 0)
 		status = ft_exit(root, n, info->env, info->last_status);

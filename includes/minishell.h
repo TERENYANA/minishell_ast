@@ -202,6 +202,7 @@ void			heredoc_child(int p[2], t_hd *hd);
 void			close_heredoc_fds(t_node *node);
 
 int				is_builtin(char *cmd_name);
+int				is_env_builtin(char **cmd);
 int				dispatch_builtin(t_node *node, t_var **env_list,
 					int last_status);
 int				ft_echo(char **args);
@@ -213,7 +214,7 @@ int				ft_unset(char **args, t_var **env_list);
 int				ft_exit(t_node *root, t_node *cur, t_var **env,
 					int last_status);
 int				valid_name(char *str);
-int				parse_export_arg(char *arg, char **name, char **value);
+int				parse_export_arg(char *arg, char **name, char **value, int *is_append);
 int				check_option(char *arg, int *end_opt);
 void			err_export(char *name);
 void			sort_ptrs(t_var **arr, int n);

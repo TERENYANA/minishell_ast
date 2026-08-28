@@ -1,4 +1,4 @@
-objs/expand/expend_hd.o: srcs/expand/expend_hd.c includes/minishell.h \
+objs/expand/expand_hd.o: srcs/expand/expand_hd.c includes/minishell.h \
   /opt/homebrew/opt/readline/include/readline/readline.h \
   /opt/homebrew/opt/readline/include/readline/rlstdc.h \
   /opt/homebrew/opt/readline/include/readline/rltypedefs.h \

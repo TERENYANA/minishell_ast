@@ -75,7 +75,7 @@ static int	is_parent_builtin_root(t_node *root)
 {
 	return (root->type == N_CMD
 		&& root->cmd && root->cmd[0]
-		&& is_builtin(root->cmd[0]));
+		&& (is_builtin(root->cmd[0]) || is_env_builtin(root->cmd)));
 }
 
 int	run_tree(t_node *root, t_var **env, int last_status)

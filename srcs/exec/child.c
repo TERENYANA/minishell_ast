@@ -22,7 +22,7 @@ static void	exec_cmd_in_child(t_node *root, t_node *cur, t_exec_info *info)
 	close_heredoc_fds(root);
 	if (!cur->cmd || !cur->cmd[0])
 		cleanup_and_exit(root, info->env, 0);
-	if (is_builtin(cur->cmd[0]))
+	if (is_builtin(cur->cmd[0]) || is_env_builtin(cur->cmd))
 	{
 		if (ft_strcmp(cur->cmd[0], "exit") == 0)
 			status = ft_exit(root, cur, info->env, 0);
