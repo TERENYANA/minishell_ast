@@ -1,1 +1,0 @@
-- "exit abcd" -> Bash ne ferme pas alors que minishell ferme.

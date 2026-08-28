@@ -195,8 +195,8 @@ int	main(int argc, char **argv, char **envp)
 	t_var	*env;
 	int		status;
 
-	(void)argc;
-	(void)argv;
+	(void)ac;
+	(void)av;
 	env = create_env(envp);
 	init_env_vars(&env);
 	status = 0;
