@@ -34,6 +34,7 @@ endif
 
 SRCS = \
 	srcs/main.c \
+	srcs/read_input.c \
 	srcs/run_line.c \
 	srcs/builtins/builtins.c \
 	srcs/builtins/ft_cd.c \
@@ -49,6 +50,7 @@ SRCS = \
 	srcs/env/env_init.c \
 	srcs/env/env_set.c \
 	srcs/exec/child_exec.c \
+	srcs/exec/child_exec_utils.c \
 	srcs/exec/child_pipe.c \
 	srcs/exec/child.c \
 	srcs/exec/exec.c \

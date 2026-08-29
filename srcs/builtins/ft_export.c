@@ -12,13 +12,29 @@
 
 #include "minishell.h"
 
+static int	handle_append(t_var **env_list, char *name, char *value)
+{
+	t_var	*existing;
+	char	*joined;
+
+	existing = find_var(*env_list, name);
+	if (existing && existing->value && value)
+	{
+		joined = ft_strjoin(existing->value, value);
+		free(value);
+		value = joined;
+	}
+	if (value)
+		env_set(env_list, name, value);
+	free(name);
+	return (0);
+}
+
 static int	handle_export_arg(char *arg, t_var **env_list)
 {
 	char	*name;
 	char	*value;
 	int		is_append;
-	t_var	*existing;
-	char	*joined;
 
 	if (parse_export_arg(arg, &name, &value, &is_append))
 		return (1);
@@ -30,19 +46,7 @@ static int	handle_export_arg(char *arg, t_var **env_list)
 		return (1);
 	}
 	if (is_append)
-	{
-		existing = find_var(*env_list, name);
-		if (existing && existing->value && value)
-		{
-			joined = ft_strjoin(existing->value, value);
-			free(value);
-			value = joined;
-		}
-		if (value)
-			env_set(env_list, name, value);
-		free(name);
-		return (0);
-	}
+		return (handle_append(env_list, name, value));
 	if (value || !find_var(*env_list, name))
 		env_set(env_list, name, value);
 	free(name);
