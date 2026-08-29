@@ -65,7 +65,7 @@ static int	hd_line(int p[2], char *line, t_hd *hd)
 {
 	if (!line)
 	{
-		if (g_sig == 130)
+		if (g_sig == SIGINT)
 			return (-1);
 		ft_putstr_fd("minishell: warning: here-document delimited ", 2);
 		ft_putstr_fd("by end-of-file (wanted `", 2);
@@ -102,7 +102,7 @@ void	heredoc_child(int p[2], t_hd *hd)
 				free(hd->line);
 			if (ret == -1)
 			{
-				if (g_sig == 130)
+				if (g_sig == SIGINT)
 					cleanup_and_exit(hd->root, hd->env, 130);
 				cleanup_and_exit(hd->root, hd->env, 1);
 			}
