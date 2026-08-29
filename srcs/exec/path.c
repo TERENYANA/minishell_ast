@@ -6,12 +6,15 @@
 /*   By: masolet- <masolet-@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/08/18 15:43:35 by yyuskiv           #+#    #+#             */
-/*   Updated: 2026/08/28 14:13:46 by masolet-         ###   ########.fr       */
+/*   Updated: 2026/08/29 15:23:10 by masolet-         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "minishell.h"
 
+/*
+ * Checks whether the given filesystem path is a directory.
+ */
 static int	is_directory(const char *path)
 {
 	struct stat	st;
@@ -21,6 +24,9 @@ static int	is_directory(const char *path)
 	return (0);
 }
 
+/*
+ * Joins a directory path and a command name into a full executable path.
+ */
 static char	*join_path(const char *dir, const char *cmd)
 {
 	char	*tmp;
@@ -34,6 +40,10 @@ static char	*join_path(const char *dir, const char *cmd)
 	return (res);
 }
 
+/*
+ * Scans every PATH directory entry and returns the first executable file
+ * matching the command name while skipping directories.
+ */
 static char	*search_in_paths(char **dirs, const char *cmd)
 {
 	char	*full;
@@ -51,6 +61,10 @@ static char	*search_in_paths(char **dirs, const char *cmd)
 	return (NULL);
 }
 
+/*
+ * Resolves the full path of a command by checking direct paths first,
+ * then searching through PATH directories to find an executable match.
+ */
 char	*find_cmd_path(char *cmd, t_var *env)
 {
 	char	**dirs;

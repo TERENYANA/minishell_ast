@@ -6,12 +6,15 @@
 /*   By: masolet- <masolet-@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/08/18 15:36:03 by yyuskiv           #+#    #+#             */
-/*   Updated: 2026/08/29 15:03:21 by masolet-         ###   ########.fr       */
+/*   Updated: 2026/08/29 15:27:57 by masolet-         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "minishell.h"
 
+/*
+ * Skips whitespace characters in an exit argument before parsing it.
+ */
 static int	skip_ws(const char *s, int i)
 {
 	while (s[i] == ' ' || (s[i] >= 9 && s[i] <= 13))
@@ -19,6 +22,9 @@ static int	skip_ws(const char *s, int i)
 	return (i);
 }
 
+/*
+ * Parses an optional leading sign for the exit-status argument.
+ */
 static int	parse_sign(const char *s, int *i)
 {
 	if (s[*i] == '+' || s[*i] == '-')
@@ -56,6 +62,9 @@ static int	fits_in_long_long(const char *str, long long *out)
 	return (*out = (long long)res * sign, 1);
 }
 
+/*
+ * Prints the shell error used when the exit argument is not numeric.
+ */
 static void	exit_numeric_err(const char *arg)
 {
 	ft_putstr_fd("minishell: exit: ", 2);
@@ -63,6 +72,10 @@ static void	exit_numeric_err(const char *arg)
 	ft_putendl_fd(": numeric argument required", 2);
 }
 
+/*
+ * Implements the exit builtin: validates the optional argument, handles errors,
+ * and terminates the shell with the requested status or the previous one.
+ */
 int	ft_exit(t_node *root, t_node *cur, t_var **env, int last_status)
 {
 	long long	code;

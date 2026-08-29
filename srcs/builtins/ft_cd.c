@@ -12,6 +12,9 @@
 
 #include "minishell.h"
 
+/*
+ * Resolves the HOME directory for a cd command and reports when it is unset.
+ */
 static char	*cd_home(t_var *env, int *no_op)
 {
 	char	*path;
@@ -31,6 +34,9 @@ static char	*cd_home(t_var *env, int *no_op)
 	return (path);
 }
 
+/*
+ * Resolves the previous directory for cd - and prints it when available.
+ */
 static char	*cd_oldpwd(t_var *env, int *should_print)
 {
 	char	*path;
@@ -45,6 +51,9 @@ static char	*cd_oldpwd(t_var *env, int *should_print)
 	return (path);
 }
 
+/*
+ * Chooses the target directory for cd, including HOME and OLDPWD shortcuts.
+ */
 static char	*get_target_path(char **args, t_var *env, int *should_print,
 		int *no_op)
 {
@@ -57,6 +66,10 @@ static char	*get_target_path(char **args, t_var *env, int *should_print,
 	return (args[1]);
 }
 
+/*
+ * Changes the working directory, updates PWD/OLDPWD, and optionally prints
+ * the new path when cd - is used.
+ */
 static int	execute_cd(t_var **env_list, char *target_path, int should_print)
 {
 	char	*old_pwd;
@@ -83,6 +96,10 @@ static int	execute_cd(t_var **env_list, char *target_path, int should_print)
 	return (0);
 }
 
+/*
+ * Implements the shell builtin cd: validates arguments, resolves the target,
+ * performs the directory change, and updates environment variables.
+ */
 int	ft_cd(char **args, t_var **env_list)
 {
 	char	*target_path;

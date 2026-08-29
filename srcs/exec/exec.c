@@ -12,6 +12,10 @@
 
 #include "minishell.h"
 
+/*
+ * Expands each argument of a command node using shell expansion rules,
+ * handling empty results, wildcard expansion, and storing the final arguments.
+ */
 void	expand_cmd_args(t_node *cmd_node, t_var *env, int status)
 {
 	char	**old_cmd;
@@ -37,6 +41,10 @@ void	expand_cmd_args(t_node *cmd_node, t_var *env, int status)
 	ft_free_tab(old_cmd);
 }
 
+/*
+ * Executes a parent-side builtin command after expansion and redirection.
+ * It returns the builtin result while preserving the shell state.
+ */
 static int	execute_parent_builtin(t_node *node, t_var **env, int last_status)
 {
 	expand_cmd_args(node, *env, last_status);
@@ -47,6 +55,10 @@ static int	execute_parent_builtin(t_node *node, t_var **env, int last_status)
 	return (dispatch_builtin(node, env, last_status));
 }
 
+/*
+ * Runs a builtin in the parent shell while temporarily saving stdin/stdout,
+ * so redirections are contained to the builtin call and then restored.
+ */
 static int	run_builtin_in_parent(t_node *node, t_var **env, int last_status)
 {
 	int	saved_in;
@@ -71,6 +83,10 @@ static int	run_builtin_in_parent(t_node *node, t_var **env, int last_status)
 	return (ret);
 }
 
+/*
+ * Checks whether the current root node is a command that should be executed
+ * as a builtin directly in the parent process.
+ */
 static int	is_parent_builtin_root(t_node *root)
 {
 	return (root->type == N_CMD
@@ -78,6 +94,10 @@ static int	is_parent_builtin_root(t_node *root)
 		&& (is_builtin(root->cmd[0]) || is_env_builtin(root->cmd)));
 }
 
+/*
+ * Recursively executes the AST: logical AND/OR chains are evaluated left-to-right,
+ * parent builtins run directly in the shell, and everything else is executed in a forked child.
+ */
 int	run_tree(t_node *root, t_var **env, int last_status)
 {
 	int	status;

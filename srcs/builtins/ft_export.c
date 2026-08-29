@@ -12,6 +12,10 @@
 
 #include "minishell.h"
 
+/*
+ * Appends a value to an existing environment variable when the export
+ * argument uses the += form.
+ */
 static int	handle_append(t_var **env_list, char *name, char *value)
 {
 	t_var	*existing;
@@ -30,6 +34,9 @@ static int	handle_append(t_var **env_list, char *name, char *value)
 	return (0);
 }
 
+/*
+ * Validates and applies a single export argument to the shell environment.
+ */
 static int	handle_export_arg(char *arg, t_var **env_list)
 {
 	char	*name;
@@ -53,6 +60,10 @@ static int	handle_export_arg(char *arg, t_var **env_list)
 	return (0);
 }
 
+/*
+ * Iterates over export arguments, stops on the end-of-options marker,
+ * and reports any invalid assignment encountered.
+ */
 static int	export_loop(char **args, t_var **env_list, int *end_opt)
 {
 	int	i;
@@ -73,6 +84,9 @@ static int	export_loop(char **args, t_var **env_list, int *end_opt)
 	return (error);
 }
 
+/*
+ * Implements the shell export builtin: prints the environment or updates it.
+ */
 int	ft_export(char **args, t_var **env_list)
 {
 	int	end_opt;

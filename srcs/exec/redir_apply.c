@@ -12,6 +12,9 @@
 
 #include "minishell.h"
 
+/*
+ * Opens the file or pipe associated with a redirection based on its type.
+ */
 static int	open_redir(t_redirect *r)
 {
 	if (!r)
@@ -25,6 +28,9 @@ static int	open_redir(t_redirect *r)
 	return (open(r->target, O_WRONLY | O_CREAT | O_TRUNC, 0644));
 }
 
+/*
+ * Prints the standard shell error message for a redirection failure.
+ */
 static int	perror_redir(const char *target)
 {
 	ft_putstr_fd("minishell: ", 2);
@@ -35,6 +41,9 @@ static int	perror_redir(const char *target)
 	return (1);
 }
 
+/*
+ * Reports an ambiguous redirect after expansion and frees temporary matches.
+ */
 static int	ambiguous_redir_error(const char *target, char *exp, char **m)
 {
 	ft_putstr_fd("minishell: ", 2);
@@ -47,6 +56,10 @@ static int	ambiguous_redir_error(const char *target, char *exp, char **m)
 	return (1);
 }
 
+/*
+ * Expands a redirection target, resolves wildcard matches if needed,
+ * and rejects ambiguous expansions before applying the redirect.
+ */
 static int	process_target(t_redirect *r, t_var *env, int status)
 {
 	char	*exp;
@@ -75,6 +88,10 @@ static int	process_target(t_redirect *r, t_var *env, int status)
 	return (0);
 }
 
+/*
+ * Applies every redirection attached to a command by expanding targets,
+ * opening the required file descriptors, and redirecting stdin or stdout.
+ */
 int	apply_redirections(t_node *cmd_node, t_var *env, int status)
 {
 	t_redirect	*r;
