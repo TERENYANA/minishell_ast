@@ -34,6 +34,13 @@ static void	parse_line(char *envp_line, char **name, char **value)
 	}
 }
 
+/*
+** Allocates and fills a single t_var node from one raw envp line.
+** Kept for callers elsewhere in the project that still need a
+** standalone node (create_env itself no longer uses this -- see
+** below); parsing logic mirrors parse_line but builds the node
+** directly instead of returning name/value separately.
+*/
 t_var	*new_var(char *envp_line)
 {
 	t_var	*node;
@@ -64,7 +71,7 @@ t_var	*new_var(char *envp_line)
 ** handed to main() by the OS. Uses env_set (not a raw append) for
 ** each line so that if envp ever contains the same variable name
 ** twice, the second occurrence UPDATES the existing node instead
-** of creating a duplicate -- matching real shell semantics, where
+** of creating a duplicate , where
 ** the last assignment of a repeated name wins and env/export never
 ** show the same variable more than once.
 */

@@ -12,6 +12,14 @@
 
 #include "minishell.h"
 
+/*
+** Looks up a variable by name in the shell's t_var list and returns
+** its value (or NULL if not found, or if found but has no value --
+** e.g. a variable that was `export`ed without an '=', like '_' after
+** create_env, or an unset-then-re-exported name). This is the single
+** read path used everywhere the shell needs a variable's value:
+** $VAR expansion, PATH lookup, HOME/OLDPWD for cd, etc.
+*/
 char	*get_env_value(char *name, t_var *env)
 {
 	while (env)
@@ -23,6 +31,14 @@ char	*get_env_value(char *name, t_var *env)
 	return (NULL);
 }
 
+/*
+** Counts how many nodes in the list actually have a value set.
+** Variables with value == NULL (exported but never assigned, e.g.
+** `export FOO` with no '=') exist in the shell's own bookkeeping
+** but must never appear in the envp array handed to execve --
+** a real OS environment has no concept of a "name-only" entry.
+** This sizes the array convert_env_list is about to allocate.
+*/
 static int	count_valued(t_var *env)
 {
 	int	n;
@@ -37,6 +53,11 @@ static int	count_valued(t_var *env)
 	return (n);
 }
 
+/*
+** Builds one "NAME=VALUE" string for a single t_var node, the exact
+** format execve's envp array expects. Frees the intermediate
+** "NAME=" string itself; the caller owns the final joined string.
+*/
 static char	*env_join(t_var *v)
 {
 	char	*tmp;
@@ -50,6 +71,16 @@ static char	*env_join(t_var *v)
 	return (res);
 }
 
+/*
+** Converts the shell's internal t_var list into a char** array in
+** the "NAME=VALUE" format execve requires. Only nodes with a value
+** are included (see count_valued) -- this is the bridge between the
+** shell's own environment representation and what the OS actually
+** needs when launching an external command. NULL-terminated, as
+** every envp array must be. On any allocation failure partway
+** through, the partially-built array is freed and NULL returned so
+** the caller never gets a half-filled, unterminated array.
+*/
 char	**convert_env_list(t_var *env)
 {
 	char	**arr;

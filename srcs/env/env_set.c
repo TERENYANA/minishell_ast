@@ -12,6 +12,12 @@
 
 #include "minishell.h"
 
+/*
+** Finds and returns the t_var node matching `name`, or NULL if no
+** such variable exists. Unlike get_env_value, this returns the
+** NODE itself (not just its value), so callers can modify it in
+** place (env_set) or unlink it (env_unset).
+*/
 t_var	*find_var(t_var *env, const char *name)
 {
 	while (env)
@@ -23,6 +29,15 @@ t_var	*find_var(t_var *env, const char *name)
 	return (NULL);
 }
 
+/*
+** Allocates a brand-new node and appends it to the end of the list
+** . Only called by
+** env_set when find_var confirmed no existing node has this name,
+** so this never creates a duplicate on its own.
+** Takes ownership of `value` (stores the pointer as-is, no copy);
+** `name` is copied via ft_strdup since the caller may still need
+** its own copy afterwards (create_env frees it right after).
+*/
 static int	env_append(t_var **env, const char *name, char *value)
 {
 	t_var	*node;
@@ -48,6 +63,16 @@ static int	env_append(t_var **env, const char *name, char *value)
 	return (0);
 }
 
+/*
+** Single entry point for setting/updating an environment variable.
+** If `name` already exists, its old value is freed and replaced
+** in place (the node itself, and its position in the list, never
+** change) -- this is what keeps env/export from ever showing the
+** same variable twice, no matter how many times it's assigned.
+** If `name` doesn't exist yet, delegates to env_append to create it.
+** Takes ownership of `value` either way (freed here on update,
+** or stored/freed inside env_append on insert).
+*/
 int	env_set(t_var **env, const char *name, char *value)
 {
 	t_var	*found;
@@ -62,6 +87,13 @@ int	env_set(t_var **env, const char *name, char *value)
 	return (env_append(env, name, value));
 }
 
+/*
+** Unlinks one node from the doubly-linked list, fixing up its
+** neighbors' prev/next pointers (including the head-of-list case,
+** where node->prev is NULL), then frees the node's owned strings
+** and the node itself. Only called from env_unset once the node
+** to remove has already been found.
+*/
 static void	env_remove(t_var **env, t_var *node)
 {
 	if (node->prev)
@@ -75,6 +107,11 @@ static void	env_remove(t_var **env, t_var *node)
 	free(node);
 }
 
+/*
+** Removes a variable from the environment by name (used by the
+** `unset` builtin). Silently does nothing if the name isn't found --
+** unset on a non-existent variable is not an error in bash either.
+*/
 void	env_unset(t_var **env, const char *name)
 {
 	t_var	*node;
