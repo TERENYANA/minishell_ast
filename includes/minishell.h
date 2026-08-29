@@ -215,7 +215,8 @@ int				ft_unset(char **args, t_var **env_list);
 int				ft_exit(t_node *root, t_node *cur, t_var **env,
 					int last_status);
 int				valid_name(char *str);
-int				parse_export_arg(char *arg, char **name, char **value, int *is_append);
+int				parse_export_arg(char *arg, char **name,
+					char **value, int *is_append);
 int				check_option(char *arg, int *end_opt);
 void			err_export(char *name);
 void			sort_ptrs(t_var **arr, int n);
