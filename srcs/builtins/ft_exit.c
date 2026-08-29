@@ -6,7 +6,7 @@
 /*   By: masolet- <masolet-@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/08/18 15:36:03 by yyuskiv           #+#    #+#             */
-/*   Updated: 2026/08/28 14:14:55 by masolet-         ###   ########.fr       */
+/*   Updated: 2026/08/29 15:03:21 by masolet-         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -74,7 +74,7 @@ int	ft_exit(t_node *root, t_node *cur, t_var **env, int last_status)
 	if (!fits_in_long_long(cur->cmd[1], &code))
 	{
 		exit_numeric_err(cur->cmd[1]);
-		return(2);
+		return (2);
 	}
 	if (cur->cmd[2])
 		return (err_msg("exit", "too many arguments", 2));
