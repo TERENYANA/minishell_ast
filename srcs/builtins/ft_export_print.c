@@ -49,6 +49,30 @@ static void	print_sorted(t_var **arr, int n)
 	}
 }
 
+void	sort_ptrs(t_var **arr, int n)
+{
+	int		i;
+	int		j;
+	t_var	*tmp;
+
+	i = 0;
+	while (i < n - 1)
+	{
+		j = 0;
+		while (j < n - 1 - i)
+		{
+			if (ft_strcmp(arr[j]->name, arr[j + 1]->name) > 0)
+			{
+				tmp = arr[j];
+				arr[j] = arr[j + 1];
+				arr[j + 1] = tmp;
+			}
+			j++;
+		}
+		i++;
+	}
+}
+
 int	print_export(t_var *env)
 {
 	t_var	**arr;
@@ -70,5 +94,6 @@ int	print_export(t_var *env)
 	}
 	sort_ptrs(arr, n);
 	print_sorted(arr, n);
-	return (free(arr), 0);
+	free(arr);
+	return (0);
 }

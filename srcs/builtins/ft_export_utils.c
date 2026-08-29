@@ -37,6 +37,21 @@ void	err_export(char *name)
 	ft_putstr_fd("': not a valid identifier\n", 2);
 }
 
+static int	extract_value(char *equal_pos, char **name, char **value)
+{
+	*value = NULL;
+	if (equal_pos)
+	{
+		*value = ft_strdup(equal_pos + 1);
+		if (!*value)
+		{
+			free(*name);
+			return (1);
+		}
+	}
+	return (0);
+}
+
 int	parse_export_arg(char *arg, char **name, char **value, int *is_append)
 {
 	char	*equal_pos;
@@ -46,26 +61,19 @@ int	parse_export_arg(char *arg, char **name, char **value, int *is_append)
 		return (1);
 	*is_append = 0;
 	equal_pos = ft_strchr(arg, '=');
-	name_len = equal_pos ? equal_pos - arg : (int)ft_strlen(arg);
+	if (equal_pos)
+		name_len = equal_pos - arg;
+	else
+		name_len = ft_strlen(arg);
 	if (equal_pos && name_len > 0 && arg[name_len - 1] == '+')
 	{
 		*is_append = 1;
 		name_len--;
 	}
-	if (!equal_pos)
-		*name = ft_strdup(arg);
-	else
-		*name = ft_substr(arg, 0, name_len);
+	*name = ft_substr(arg, 0, name_len);
 	if (!*name)
 		return (1);
-	*value = NULL;
-	if (equal_pos)
-	{
-		*value = ft_strdup(equal_pos + 1);
-		if (!*value)
-			return (free(*name), 1);
-	}
-	return (0);
+	return (extract_value(equal_pos, name, value));
 }
 
 int	check_option(char *arg, int *end_opt)
@@ -85,26 +93,3 @@ int	check_option(char *arg, int *end_opt)
 	return (0);
 }
 
-void	sort_ptrs(t_var **arr, int n)
-{
-	int		i;
-	int		j;
-	t_var	*tmp;
-
-	i = 0;
-	while (i < n - 1)
-	{
-		j = 0;
-		while (j < n - 1 - i)
-		{
-			if (ft_strcmp(arr[j]->name, arr[j + 1]->name) > 0)
-			{
-				tmp = arr[j];
-				arr[j] = arr[j + 1];
-				arr[j + 1] = tmp;
-			}
-			j++;
-		}
-		i++;
-	}
-}

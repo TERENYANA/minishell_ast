@@ -57,10 +57,20 @@ static char	*get_target_path(char **args, t_var *env, int *should_print,
 	return (args[1]);
 }
 
-static int	update_pwd(t_var **env_list, char *old_pwd)
+static int	execute_cd(t_var **env_list, char *target_path, int should_print)
 {
+	char	*old_pwd;
 	char	*current_pwd;
 
+	old_pwd = getcwd(NULL, 0);
+	if (chdir(target_path) != 0)
+	{
+		perror("minishell: cd");
+		free(old_pwd);
+		return (1);
+	}
+	if (should_print)
+		ft_putendl_fd(target_path, STDOUT_FILENO);
 	current_pwd = getcwd(NULL, 0);
 	if (!current_pwd)
 	{
@@ -76,7 +86,6 @@ static int	update_pwd(t_var **env_list, char *old_pwd)
 int	ft_cd(char **args, t_var **env_list)
 {
 	char	*target_path;
-	char	*old_pwd;
 	int		should_print;
 	int		no_op;
 
@@ -92,14 +101,5 @@ int	ft_cd(char **args, t_var **env_list)
 		return (0);
 	if (!target_path)
 		return (1);
-	old_pwd = getcwd(NULL, 0);
-	if (chdir(target_path) != 0)
-	{
-		perror("minishell: cd");
-		free(old_pwd);
-		return (1);
-	}
-	if (should_print)
-		ft_putendl_fd(target_path, STDOUT_FILENO);
-	return (update_pwd(env_list, old_pwd));
+	return (execute_cd(env_list, target_path, should_print));
 }
