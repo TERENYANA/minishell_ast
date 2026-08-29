@@ -131,7 +131,6 @@ void			setup_heredoc_signals(void);
 void			setup_child_signals(void);
 
 t_var			*create_env(char **envp);
-t_var			*new_var(char *envp_line);
 t_var			*find_var(t_var *env, const char *name);
 char			*get_env_value(char *name, t_var *env);
 char			**convert_env_list(t_var *env);

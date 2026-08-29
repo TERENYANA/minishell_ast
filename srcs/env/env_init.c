@@ -6,7 +6,7 @@
 /*   By: masolet- <masolet-@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/08/18 15:39:07 by yyuskiv           #+#    #+#             */
-/*   Updated: 2026/08/29 15:02:42 by masolet-         ###   ########.fr       */
+/*   Updated: 2026/08/29 19:52:43 by masolet-         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -32,38 +32,6 @@ static void	parse_line(char *envp_line, char **name, char **value)
 		*name = ft_strdup(envp_line);
 		*value = NULL;
 	}
-}
-
-/*
-** Allocates and fills a single t_var node from one raw envp line.
-** Kept for callers elsewhere in the project that still need a
-** standalone node (create_env itself no longer uses this -- see
-** below); parsing logic mirrors parse_line but builds the node
-** directly instead of returning name/value separately.
-*/
-t_var	*new_var(char *envp_line)
-{
-	t_var	*node;
-	char	*eq;
-
-	node = ft_calloc(1, sizeof(t_var));
-	if (!node)
-		return (NULL);
-	eq = ft_strchr(envp_line, '=');
-	if (eq)
-	{
-		node->name = ft_substr(envp_line, 0, eq - envp_line);
-		node->value = ft_strdup(eq + 1);
-		if (!node->name || !node->value)
-			return (free(node->name), free(node->value), free(node), NULL);
-	}
-	else
-	{
-		node->name = ft_strdup(envp_line);
-		if (!node->name)
-			return (free(node), NULL);
-	}
-	return (node);
 }
 
 /*
