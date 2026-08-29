@@ -6,12 +6,15 @@
 /*   By: masolet- <masolet-@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/08/18 15:37:01 by yyuskiv           #+#    #+#             */
-/*   Updated: 2026/08/29 15:03:43 by masolet-         ###   ########.fr       */
+/*   Updated: 2026/08/29 15:29:06 by masolet-         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "minishell.h"
 
+/*
+ * Validates that an export variable name is syntactically valid.
+ */
 int	valid_name(char *str)
 {
 	int	i;
@@ -30,6 +33,9 @@ int	valid_name(char *str)
 	return (0);
 }
 
+/*
+ * Prints the standard error message when an export identifier is invalid.
+ */
 void	err_export(char *name)
 {
 	ft_putstr_fd("minishell: export: '", 2);
@@ -37,6 +43,9 @@ void	err_export(char *name)
 	ft_putstr_fd("': not a valid identifier\n", 2);
 }
 
+/*
+ * Extracts the value part of an export assignment, if one is present.
+ */
 static int	extract_value(char *equal_pos, char **name, char **value)
 {
 	*value = NULL;
@@ -52,6 +61,10 @@ static int	extract_value(char *equal_pos, char **name, char **value)
 	return (0);
 }
 
+/*
+ * Parses an export argument into a variable name and an optional value,
+ * while detecting appending syntax such as NAME+=value.
+ */
 int	parse_export_arg(char *arg, char **name, char **value, int *is_append)
 {
 	char	*equal_pos;
@@ -76,6 +89,9 @@ int	parse_export_arg(char *arg, char **name, char **value, int *is_append)
 	return (extract_value(equal_pos, name, value));
 }
 
+/*
+ * Checks whether an option token is provided to export and handles invalid usage.
+ */
 int	check_option(char *arg, int *end_opt)
 {
 	if (!*end_opt && arg[0] == '-' && arg[1] != '\0')

@@ -3,15 +3,18 @@
 /*                                                        :::      ::::::::   */
 /*   builtins.c                                         :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: yyuskiv <yyuskiv@student.42.fr>            +#+  +:+       +#+        */
+/*   By: masolet- <masolet-@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/08/18 15:34:38 by yyuskiv           #+#    #+#             */
-/*   Updated: 2026/08/28 19:18:44 by yyuskiv          ###   ########.fr       */
+/*   Updated: 2026/08/29 15:25:46 by masolet-         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "minishell.h"
 
+/*
+ * Checks whether a command name matches one of the shell builtins.
+ */
 int	is_builtin(char *cmd_name)
 {
 	if (!cmd_name)
@@ -24,11 +27,18 @@ int	is_builtin(char *cmd_name)
 	return (0);
 }
 
+/*
+ * Detects the special case where the command is a bare env builtin
+ * with no additional arguments.
+ */
 int	is_env_builtin(char **cmd)
 {
 	return (cmd && cmd[0] && ft_strcmp(cmd[0], "env") == 0 && !cmd[1]);
 }
 
+/*
+ * Dispatches a builtin command to the correct implementation based on its name.
+ */
 int	dispatch_builtin(t_node *node, t_var **env_list, int last_status)
 {
 	char	**args;

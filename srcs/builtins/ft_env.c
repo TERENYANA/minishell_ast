@@ -6,12 +6,16 @@
 /*   By: masolet- <masolet-@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/08/18 15:35:42 by yyuskiv           #+#    #+#             */
-/*   Updated: 2026/08/28 14:14:52 by masolet-         ###   ########.fr       */
+/*   Updated: 2026/08/29 15:26:57 by masolet-         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "minishell.h"
 
+/*
+ * Prints the environment variables in the shell format NAME=value,
+ * skipping entries that do not currently have a value.
+ */
 int	ft_env(t_var *env)
 {
 	if (!env)

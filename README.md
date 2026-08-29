@@ -19,7 +19,7 @@ In this project, we implemented a custom shell that supports basic features foun
 To compile the project, clone the repository and run `make` at the root of the project:
 
 ```bash
-git clone <repository_url> minishell
+git clone <url> minishell
 cd minishell
 make
 ```

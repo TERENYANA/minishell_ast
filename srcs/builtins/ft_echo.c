@@ -12,6 +12,9 @@
 
 #include "minishell.h"
 
+/*
+ * Checks whether an argument is a valid -n option sequence for echo.
+ */
 static int	is_n_flag(char *arg)
 {
 	int	j;
@@ -24,6 +27,10 @@ static int	is_n_flag(char *arg)
 	return (arg[j] == '\0');
 }
 
+/*
+ * Implements the echo builtin: prints arguments separated by spaces and
+ * suppresses the trailing newline when the -n flag is used repeatedly.
+ */
 int	ft_echo(char **args)
 {
 	int	i;

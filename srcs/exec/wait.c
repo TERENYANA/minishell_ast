@@ -6,12 +6,16 @@
 /*   By: masolet- <masolet-@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/08/18 15:43:55 by yyuskiv           #+#    #+#             */
-/*   Updated: 2026/08/28 14:13:31 by masolet-         ###   ########.fr       */
+/*   Updated: 2026/08/29 15:25:10 by masolet-         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "minishell.h"
 
+/*
+ * Converts a child process wait status into the shell-style exit code,
+ * including signal termination handling and the usual 128 + signal convention.
+ */
 int	handle_child_status(int wstatus)
 {
 	if (WIFSIGNALED(wstatus))

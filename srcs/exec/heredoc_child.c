@@ -12,6 +12,10 @@
 
 #include "minishell.h"
 
+/*
+ * Reads one line of heredoc input, using readline for interactive mode
+ * or get_next_line otherwise, and strips the trailing newline when present.
+ */
 static char	*hd_read_line(void)
 {
 	char	*line;
@@ -28,6 +32,10 @@ static char	*hd_read_line(void)
 	return (line);
 }
 
+/*
+ * Writes one heredoc line into the pipe, expanding variables when required
+ * and appending a newline to preserve the content sent to the consumer.
+ */
 static int	write_pipe(int fd, char *line, t_hd *hd)
 {
 	char	*expanded;
@@ -49,6 +57,10 @@ static int	write_pipe(int fd, char *line, t_hd *hd)
 	return (0);
 }
 
+/*
+ * Processes one heredoc line: stops on EOF or the delimiter, warns if needed,
+ * and writes valid content to the pipe; returns a control value for the loop.
+ */
 static int	hd_line(int p[2], char *line, t_hd *hd)
 {
 	if (!line)
@@ -68,6 +80,10 @@ static int	hd_line(int p[2], char *line, t_hd *hd)
 	return (1);
 }
 
+/*
+ * Runs the heredoc child process: reads the input loop, writes each line to
+ * the pipe until the delimiter is reached or the process is interrupted.
+ */
 void	heredoc_child(int p[2], t_hd *hd)
 {
 	char	*line;

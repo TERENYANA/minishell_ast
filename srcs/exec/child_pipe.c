@@ -12,6 +12,10 @@
 
 #include "minishell.h"
 
+/*
+ * Runs the left branch of a pipe in the child process by redirecting
+ * standard output to the write end of the pipe and executing the left node.
+ */
 static void	run_left(t_node *root, t_node *cur, int pf[2], t_exec_info *info)
 {
 	close(pf[0]);
@@ -20,6 +24,10 @@ static void	run_left(t_node *root, t_node *cur, int pf[2], t_exec_info *info)
 	exec_node_in_child(root, cur->left, info);
 }
 
+/*
+ * Runs the right branch of a pipe in the child process by redirecting
+ * standard input to the read end of the pipe and executing the right node.
+ */
 static void	run_right(t_node *root, t_node *cur, int pf[2], t_exec_info *info)
 {
 	close(pf[1]);
@@ -28,6 +36,10 @@ static void	run_right(t_node *root, t_node *cur, int pf[2], t_exec_info *info)
 	exec_node_in_child(root, cur->right, info);
 }
 
+/*
+ * Creates a child process for the left side of the pipeline.
+ * In the child, it configures the pipe output and executes the left subtree.
+ */
 static pid_t	fork_left(t_node *root, t_node *cur, int pf[2],
 		t_exec_info *info)
 {
@@ -45,6 +57,10 @@ static pid_t	fork_left(t_node *root, t_node *cur, int pf[2],
 	return (pid);
 }
 
+/*
+ * Creates a child process for the right side of the pipeline.
+ * In the child, it configures the pipe input and executes the right subtree.
+ */
 static pid_t	fork_right(t_node *root, t_node *cur, int pf[2],
 		t_exec_info *info)
 {
@@ -62,6 +78,11 @@ static pid_t	fork_right(t_node *root, t_node *cur, int pf[2],
 	return (pid);
 }
 
+/*
+ * Executes a command pipeline in child processes: creates the pipe,
+ * forks both sides, connects each side to the pipe ends, waits for both
+ * children, and exits with the final status of the right-hand command.
+ */
 void	exec_pipe_in_child(t_node *root, t_node *cur, t_exec_info *info)
 {
 	int		pf[2];

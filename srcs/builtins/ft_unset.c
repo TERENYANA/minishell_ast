@@ -12,6 +12,9 @@
 
 #include "minishell.h"
 
+/*
+ * Prints an error message for an invalid option passed to unset.
+ */
 static int	unset_opt_err(char *arg)
 {
 	ft_putstr_fd("minishell: unset: `", 2);
@@ -20,6 +23,9 @@ static int	unset_opt_err(char *arg)
 	return (2);
 }
 
+/*
+ * Prints an error message for an invalid identifier in an unset argument.
+ */
 static int	unset_name_err(char *arg)
 {
 	ft_putstr_fd("minishell: unset: `", 2);
@@ -28,6 +34,9 @@ static int	unset_name_err(char *arg)
 	return (0);
 }
 
+/*
+ * Implements the shell unset builtin: removes variables from the environment.
+ */
 int	ft_unset(char **args, t_var **env_list)
 {
 	int	i;

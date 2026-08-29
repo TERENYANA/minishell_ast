@@ -3,15 +3,18 @@
 /*                                                        :::      ::::::::   */
 /*   ft_export_print.c                                  :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: yyuskiv <yyuskiv@student.42.fr>            +#+  +:+       +#+        */
+/*   By: masolet- <masolet-@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/08/18 15:36:44 by yyuskiv           #+#    #+#             */
-/*   Updated: 2026/08/28 19:11:08 by yyuskiv          ###   ########.fr       */
+/*   Updated: 2026/08/29 15:28:32 by masolet-         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "minishell.h"
 
+/*
+ * Counts exported variables while skipping the special _ entry.
+ */
 static int	count_vars(t_var *env)
 {
 	int	n;
@@ -26,6 +29,9 @@ static int	count_vars(t_var *env)
 	return (n);
 }
 
+/*
+ * Prints the sorted environment list in the export format, with or without a value.
+ */
 static void	print_sorted(t_var **arr, int n)
 {
 	int	i;
@@ -49,6 +55,9 @@ static void	print_sorted(t_var **arr, int n)
 	}
 }
 
+/*
+ * Sorts an array of variable pointers alphabetically by name.
+ */
 void	sort_ptrs(t_var **arr, int n)
 {
 	int		i;
@@ -73,6 +82,9 @@ void	sort_ptrs(t_var **arr, int n)
 	}
 }
 
+/*
+ * Prints all environment variables in sorted export format.
+ */
 int	print_export(t_var *env)
 {
 	t_var	**arr;

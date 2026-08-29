@@ -12,6 +12,11 @@
 
 #include "minishell.h"
 
+/*
+ * Executes a normal command in the child process: expands arguments,
+ * applies redirections, closes heredoc pipes, handles builtins if needed,
+ * and otherwise launches the external command.
+ */
 static void	exec_cmd_in_child(t_node *root, t_node *cur, t_exec_info *info)
 {
 	int	status;
@@ -33,6 +38,10 @@ static void	exec_cmd_in_child(t_node *root, t_node *cur, t_exec_info *info)
 	exec_external_cmd(root, cur, info->env);
 }
 
+/*
+ * Executes a subshell in the child process after applying redirections
+ * and then delegating execution to the left side of the subexpression.
+ */
 static void	exec_sub_in_child(t_node *root, t_node *cur, t_exec_info *info)
 {
 	if (apply_redirections(cur, *(info->env), info->last_status) != 0)
@@ -41,6 +50,10 @@ static void	exec_sub_in_child(t_node *root, t_node *cur, t_exec_info *info)
 	exec_node_in_child(root, cur->left, info);
 }
 
+/*
+ * Selects the correct execution routine depending on the node type:
+ * command, subshell, pipeline, or logical operator chain.
+ */
 void	exec_node_in_child(t_node *root, t_node *cur, t_exec_info *info)
 {
 	setup_child_signals();
@@ -54,6 +67,10 @@ void	exec_node_in_child(t_node *root, t_node *cur, t_exec_info *info)
 		exec_andor_in_child(root, cur, info);
 }
 
+/*
+ * Forks a child process to execute the root AST node, waits for it,
+ * restores shell signal handling, and returns the final status for the caller.
+ */
 int	fork_and_run(t_node *root, t_var **env, int last_status)
 {
 	pid_t		pid;
