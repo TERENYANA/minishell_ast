@@ -11,6 +11,13 @@
 /* ************************************************************************** */
 #include "minishell.h"
 
+/*
+** After readline() returns, this checks whether the user pressed
+** Ctrl+C while typing (readline itself catches SIGINT and returns
+** an empty line, but our signal handler sets g_sig=SIGINT to signal
+** this). If so, the shell's exit status must reflect that a signal
+** interrupted the input line (128+SIGINT=130).
+*/
 static int	post_readline_status(int prev)
 {
 	if (g_sig == SIGINT)
@@ -25,7 +32,7 @@ static int	post_readline_status(int prev)
  ** Initializes the environment variables managed by the shell itself
  ** (as opposed to those inherited as-is from envp): SHLVL incremented,
  ** OLDPWD created empty if absent. '_' is left as inherited from envp
- ** (that's what a real exec would have set it to) and is only updated
+ ** and is only updated
  ** later, when this shell itself execve's an external command.
  */
 static void	init_env_vars(t_var **env)
@@ -48,6 +55,7 @@ static void	init_env_vars(t_var **env)
  ** Main REPL loop: reads a line (with continuation if needed), updates
  ** status after a SIGINT received during readline, runs the line, and
  ** stops on EOF or on a fatal error in non-interactive mode (pipe/file).
+ line = "echo \"Hello\""
  */
 static void	main_loop(t_var **env, int *status)
 {
