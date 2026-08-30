@@ -93,19 +93,20 @@ int	run_line(char *line, t_var **env, int status, int *abort)
 	err = 0;
 	tokens = tokenize_line(line, &err);
 	if (!tokens)
-		return (handle_err(err, status, abort));
+		return (free(line), handle_err(err, status, abort));
 	if (!syntax_ok(tokens, &err))
-		return (syntax_error(tokens, abort));
+		return (free(line), syntax_error(tokens, abort));
 	tree = parsing(tokens, *env, status, &err);
 	free_token_list(tokens);
 	if (!tree)
-		return (handle_err(err, status, abort));
+		return (free(line), handle_err(err, status, abort));
 	hd.root = tree;
 	hd.env = env;
 	hd.status = status;
 	hd.line = line;
 	if (process_all_heredocs(tree, &hd) == -1)
-		return (heredoc_error(tree, abort));
+		return (free(line), heredoc_error(tree, abort));
+	free(line);
 	status = run_tree(tree, env, status);
 	close_heredoc_fds(tree);
 	ft_free_node(tree);

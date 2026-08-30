@@ -74,7 +74,6 @@ static void	main_loop(t_var **env, int *status)
 			add_history(line);
 		abort = 0;
 		*status = run_line(line, env, *status, &abort);
-		free(line);
 		if (abort && !isatty(STDIN_FILENO))
 			break ;
 	}
