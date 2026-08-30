@@ -61,6 +61,10 @@ static int	execute_parent_builtin(t_node *cur, t_var **env, int last_status)
 ** tree (root), not just the subnode currently being executed --
 ** otherwise, when exit occurs inside a && / || chain, only that
 ** leaf node gets freed and the rest of the tree leaks.
+** ft_exit()'s return value is captured into ret (not discarded):
+** if the argument was invalid, ft_exit() returns an error code
+** instead of exiting, and that code must become this command's
+** actual exit status ($?), not the internal -2 sentinel.
 */
 static int	run_builtin_in_parent(t_node *root, t_node *cur, t_var **env,
 		int last_status)
@@ -85,14 +89,13 @@ static int	run_builtin_in_parent(t_node *root, t_node *cur, t_var **env,
 	close(saved_in);
 	close(saved_out);
 	if (ret == -2)
-		ft_exit(root, cur, env, last_status);
+		ret = ft_exit(root, cur, env, last_status);
 	return (ret);
 }
 
 static int	is_parent_builtin_root(t_node *cur)
 {
-	return (cur->type == N_CMD
-		&& cur->cmd && cur->cmd[0]
+	return (cur->type == N_CMD && cur->cmd && cur->cmd[0]
 		&& (is_builtin(cur->cmd[0]) || is_env_builtin(cur->cmd)));
 }
 
