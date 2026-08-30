@@ -12,6 +12,15 @@
 
 #include "minishell.h"
 
+/*
+** Utilities for building up a single N_CMD node's argument list one
+** WORD token at a time (add_word/add_arg), plus is_cmd_end, which
+** every parsing function uses to answer "have I reached the
+** boundary of the current command?" (a pipe, &&, ||, or a closing
+** paren). Since cmd is a plain char** with no reserved capacity,
+** add_arg reallocates and copies on every call -- fine at the small
+** argument counts a shell command has.
+*/
 t_node	*syntax_err_node(t_node *node, t_parse_info *info)
 {
 	if (info && info->error_code)

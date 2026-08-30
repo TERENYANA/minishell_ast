@@ -12,6 +12,17 @@
 
 #include "minishell.h"
 
+/*
+** Handles '(' ... ')' blocks. parse_primary is what parse_pipeline
+** actually calls for each side of a pipe: if the next token isn't
+** '(', it's just an ordinary command; if it is, everything up to
+** the matching ')' is parsed as a full nested list (parse_list, so
+** &&/|| work inside parentheses too) and the resulting subtree is
+** wrapped in a single N_SUB node by wrap_sub -- which also picks up
+** any redirects trailing the ')', since those apply to the whole
+** block, not to one command inside it.
+*/
+
 static t_node	*wrap_sub(t_node *inner, t_token **cur, t_parse_info *info)
 {
 	t_node	*sub;

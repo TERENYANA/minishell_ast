@@ -12,6 +12,17 @@
 
 #include "minishell.h"
 
+/*
+** Turns one redirect operator + its target token (<, >, >>, or 
+** followed by a WORD) into a t_redirect and attaches it to a
+** command node's redirect list. Heredocs get special handling here
+** (setup_heredoc): whether $VAR expansion happens inside the
+** heredoc body is decided by whether the delimiter itself was
+** quoted, and that decision is captured now, at parse time, since
+** the raw target token is about to be consumed. Ordinary file
+** redirects just store the raw target string -- $VAR expansion in
+** filenames happens later, at execution time.
+*/
 void	append_redirect(t_node *cmd_node, t_redirect *r)
 {
 	t_redirect	*cur;

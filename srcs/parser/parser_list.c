@@ -12,6 +12,18 @@
 
 #include "minishell.h"
 
+/*
+** The outermost grammar level and the parser's public entry point.
+** parse_list chains pipelines together with && and || -- done
+** iteratively (left-associative), unlike pipe chaining, because
+** left-to-right grouping actually matters for the short-circuit
+** semantics of && and ||. parsing() wraps this with setup (bundling
+** env/status into t_parse_info for redirect/heredoc expansion) and
+** a final check that every token was consumed -- leftover tokens
+** after a supposedly-complete parse (e.g. a stray unmatched paren)
+** are still reported as a syntax error even if no single parsing
+** step failed outright.
+*/
 static t_node	*list_rhs(t_node *left, t_token **cur, t_parse_info *info)
 {
 	t_node		*right;

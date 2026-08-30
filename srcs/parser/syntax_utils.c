@@ -12,6 +12,15 @@
 
 #include "minishell.h"
 
+/*
+** Small shared helpers used by both the pre-parse validator
+** (syntax.c) and the parser itself (parser*.c): classifying
+** redirect-type tokens, and printing bash's conventional
+** "syntax error near unexpected token" message. Kept separate from
+** syntax.c so parser code can call is_redir_tok/syntax_err without
+** depending on the validation logic itself.
+*/
+
 int	is_redir_tok(t_token_type t)
 {
 	return (t == REDIR_IN || t == REDIR_OUT

@@ -12,6 +12,16 @@
 
 #include "minishell.h"
 
+/*
+** Runs BEFORE any tree is built: validates the raw token list for
+** structural errors that would make parsing meaningless (an
+** operator with nothing on one side, unbalanced parentheses, a
+** command name glued directly to '(', etc). Rejecting these here
+** means parser.c/parser_list.c/parser_sub.c can assume the token
+** sequence is well-formed and never need their own error recovery
+** for these cases -- run_line() simply reports syntax error and
+** moves on if syntax_ok() returns false.
+*/
 static int	is_logic(t_token_type t)
 {
 	return (t == PIPE || t == AND_IF || t == OR_IF);

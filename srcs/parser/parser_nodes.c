@@ -12,6 +12,16 @@
 
 #include "minishell.h"
 
+/*
+** The two constructors for every node the parser ever creates.
+** new_cmd_node makes a leaf (an actual command, with cmd/redirect
+** filled in later); new_op_node makes a connector (N_PIPE, N_AND,
+** N_OR, N_SUB) that just holds pointers to two already-built
+** subtrees. Every other parser file calls these instead of
+** allocating t_node directly, so node creation and its failure
+** handling live in exactly one place.
+*/
+
 t_node	*new_cmd_node(void)
 {
 	t_node	*n;
