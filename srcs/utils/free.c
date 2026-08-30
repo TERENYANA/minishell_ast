@@ -76,6 +76,7 @@ void	cleanup_and_exit(t_node *root, t_var **env, int code)
 	ft_free_node(root);
 	if (env && *env)
 		ft_free_env(*env);
+	get_next_line(-1);
 	clear_history();
 	exit(code);
 }

@@ -44,6 +44,10 @@ void	expand_cmd_args(t_node *cmd_node, t_var *env, int status)
 /*
  * Executes a parent-side builtin command after expansion and redirection.
  * It returns the builtin result while preserving the shell state.
+ * "exit" is special-cased: instead of calling ft_exit() here (which would
+ * exit() immediately and skip the fd cleanup in run_builtin_in_parent below,
+ * leaking the dup'd saved_in/saved_out), it signals the caller with -2 so
+ * fds get restored/closed first, and ft_exit() is called only after that.
  */
 static int	execute_parent_builtin(t_node *node, t_var **env, int last_status)
 {
@@ -52,12 +56,17 @@ static int	execute_parent_builtin(t_node *node, t_var **env, int last_status)
 		return (1);
 	if (!node->cmd || !node->cmd[0])
 		return (0);
+	if (ft_strcmp(node->cmd[0], "exit") == 0)
+		return (-2);
 	return (dispatch_builtin(node, env, last_status));
 }
 
 /*
  * Runs a builtin in the parent shell while temporarily saving stdin/stdout,
  * so redirections are contained to the builtin call and then restored.
+ * If the builtin was "exit", ft_exit() (which calls cleanup_and_exit ->
+ * exit()) is only invoked AFTER saved_in/saved_out are restored and
+ * closed, so those fds never leak past the process's actual lifetime.
  */
 static int	run_builtin_in_parent(t_node *node, t_var **env, int last_status)
 {
@@ -80,6 +89,8 @@ static int	run_builtin_in_parent(t_node *node, t_var **env, int last_status)
 	dup2(saved_out, STDOUT_FILENO);
 	close(saved_in);
 	close(saved_out);
+	if (ret == -2)
+		ft_exit(node, node, env, last_status);
 	return (ret);
 }
 
