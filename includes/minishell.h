@@ -189,7 +189,7 @@ int				run_line(char *line, t_var **env, int status, int *abort);
 int				handle_child_status(int wstatus);
 void			expand_cmd_args(t_node *cmd_node, t_var *env, int status);
 int				apply_redirections(t_node *node, t_var *env, int status);
-int				fork_and_run(t_node *root, t_var **env, int last_status);
+int				fork_and_run(t_node *root, t_node *cur, t_var **env, int last_status);
 void			exec_node_in_child(t_node *root, t_node *cur,
 					t_exec_info *info);
 void			exec_external_cmd(t_node *root, t_node *cur, t_var **env);
