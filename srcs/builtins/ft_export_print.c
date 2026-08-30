@@ -6,7 +6,7 @@
 /*   By: masolet- <masolet-@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/08/18 15:36:44 by yyuskiv           #+#    #+#             */
-/*   Updated: 2026/08/29 15:28:32 by masolet-         ###   ########.fr       */
+/*   Updated: 2026/08/29 19:57:04 by masolet-         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -30,7 +30,8 @@ static int	count_vars(t_var *env)
 }
 
 /*
- * Prints the sorted environment list in the export format, with or without a value.
+ * Prints the sorted environment list in the export format,
+ * with or without a value.
  */
 static void	print_sorted(t_var **arr, int n)
 {

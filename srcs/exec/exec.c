@@ -95,8 +95,10 @@ static int	is_parent_builtin_root(t_node *root)
 }
 
 /*
- * Recursively executes the AST: logical AND/OR chains are evaluated left-to-right,
- * parent builtins run directly in the shell, and everything else is executed in a forked child.
+ * Recursively executes the AST: logical AND/OR chains
+ * are evaluated left-to-right,
+ * parent builtins run directly in the shell,
+ * and everything else is executed in a forked child.
  */
 int	run_tree(t_node *root, t_var **env, int last_status)
 {

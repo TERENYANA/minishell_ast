@@ -6,7 +6,7 @@
 /*   By: masolet- <masolet-@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/08/18 15:37:01 by yyuskiv           #+#    #+#             */
-/*   Updated: 2026/08/29 15:29:06 by masolet-         ###   ########.fr       */
+/*   Updated: 2026/08/29 19:57:18 by masolet-         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -90,7 +90,8 @@ int	parse_export_arg(char *arg, char **name, char **value, int *is_append)
 }
 
 /*
- * Checks whether an option token is provided to export and handles invalid usage.
+ * Checks whether an option token is provided to 
+ * export and handles invalid usage.
  */
 int	check_option(char *arg, int *end_opt)
 {
