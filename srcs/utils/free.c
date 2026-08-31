@@ -6,7 +6,7 @@
 /*   By: masolet- <masolet-@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/08/18 16:15:30 by yyuskiv           #+#    #+#             */
-/*   Updated: 2026/08/28 14:11:55 by masolet-         ###   ########.fr       */
+/*   Updated: 2026/08/31 18:55:31 by masolet-         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -78,5 +78,8 @@ void	cleanup_and_exit(t_node *root, t_var **env, int code)
 		ft_free_env(*env);
 	get_next_line(-1);
 	clear_history();
+	close(STDIN_FILENO);
+	close(STDOUT_FILENO);
+	close(STDERR_FILENO);
 	exit(code);
 }

@@ -100,5 +100,8 @@ int	main(int argc, char **argv, char **envp)
 	ft_free_env(env);
 	if (isatty(STDIN_FILENO))
 		ft_putendl_fd("exit", STDOUT_FILENO);
+	close(STDIN_FILENO);
+	close(STDOUT_FILENO);
+	close(STDERR_FILENO);
 	return (status);
 }

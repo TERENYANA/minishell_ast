@@ -12,16 +12,16 @@
 
 #include "minishell.h"
 
-static void	on_signal_heredoc(int signo)
+static void    on_signal_heredoc(int signo)
 {
 	g_sig = signo;
 	write(STDOUT_FILENO, "\n", 1);
 	close(STDIN_FILENO);
 }
 
-void	setup_heredoc_signals(void)
+void    setup_heredoc_signals(void)
 {
-	struct sigaction	sa;
+    struct sigaction    sa;
 
 	g_sig = 0;
 	sa.sa_handler = on_signal_heredoc;
@@ -29,5 +29,4 @@ void	setup_heredoc_signals(void)
 	sa.sa_flags = 0;
 	sigaction(SIGINT, &sa, NULL);
 	signal(SIGQUIT, SIG_IGN);
-	rl_catch_signals = 0;
 }
