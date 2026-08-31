@@ -61,6 +61,17 @@ static int	heredoc_error(t_node *tree, int *abort)
 	return (130);
 }
 
+static t_hd	setup_hd(t_node *tree, t_var **env, int status, char *line)
+{
+	t_hd	hd;
+
+	hd.root = tree;
+	hd.env = env;
+	hd.status = status;
+	hd.line = line;
+	return (hd);
+}
+
 /*
 ** Runs one full logical line end-to-end, in five stages, each
 ** owning and freeing its own intermediate structure so a failure
@@ -86,8 +97,8 @@ static int	heredoc_error(t_node *tree, int *abort)
 int	run_line(char *line, t_var **env, int status, int *abort)
 {
 	t_token	*tokens;
-	t_node	*tree;
 	t_hd	hd;
+	t_node	*tree;
 	int		err;
 
 	err = 0;
@@ -100,10 +111,7 @@ int	run_line(char *line, t_var **env, int status, int *abort)
 	free_token_list(tokens);
 	if (!tree)
 		return (free(line), handle_err(err, status, abort));
-	hd.root = tree;
-	hd.env = env;
-	hd.status = status;
-	hd.line = line;
+	hd = setup_hd(tree, env, status, line);
 	if (process_all_heredocs(tree, &hd) == -1)
 		return (free(line), heredoc_error(tree, abort));
 	free(line);
