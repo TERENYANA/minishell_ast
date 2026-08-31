@@ -6,7 +6,7 @@
 /*   By: masolet- <masolet-@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/08/18 15:36:44 by yyuskiv           #+#    #+#             */
-/*   Updated: 2026/08/29 19:57:04 by masolet-         ###   ########.fr       */
+/*   Updated: 2026/08/31 19:51:26 by masolet-         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -29,6 +29,21 @@ static int	count_vars(t_var *env)
 	return (n);
 }
 
+static void    print_escaped_value(char *value)
+{
+    int    i;
+
+    i = 0;
+    while (value[i])
+    {
+        if (value[i] == '"' || value[i] == '\\'
+            || value[i] == '$' || value[i] == '`')
+            write(STDOUT_FILENO, "\\", 1);
+        write(STDOUT_FILENO, &value[i], 1);
+        i++;
+    }
+}
+
 /*
  * Prints the sorted environment list in the export format,
  * with or without a value.
@@ -45,7 +60,7 @@ static void	print_sorted(t_var **arr, int n)
 			ft_putstr_fd("declare -x ", STDOUT_FILENO);
 			ft_putstr_fd(arr[i]->name, STDOUT_FILENO);
 			ft_putstr_fd("=\"", STDOUT_FILENO);
-			ft_putstr_fd(arr[i]->value, STDOUT_FILENO);
+			print_escaped_value(arr[i]->value);
 			ft_putendl_fd("\"", STDOUT_FILENO);
 		}
 		else

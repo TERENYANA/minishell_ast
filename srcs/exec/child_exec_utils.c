@@ -6,7 +6,7 @@
 /*   By: masolet- <masolet-@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/08/29 15:03:54 by masolet-          #+#    #+#             */
-/*   Updated: 2026/08/29 15:03:57 by masolet-         ###   ########.fr       */
+/*   Updated: 2026/08/31 20:40:07 by masolet-         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -40,7 +40,7 @@ static char	*cmd_path_or_exit(t_node *root, t_node *cur, t_var **env)
 	}
 	if (is_directory(path))
 	{
-		err_msg(cur->cmd[0], "is a directory", 0);
+		err_msg(cur->cmd[0], "Is a directory", 0);
 		free(path);
 		cleanup_and_exit(root, env, 126);
 	}
