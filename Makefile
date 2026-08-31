@@ -58,6 +58,7 @@ SRCS = \
 	srcs/exec/heredoc_child.c \
 	srcs/exec/path.c \
 	srcs/exec/redir_apply.c \
+	srcs/exec/expand_cmd_args.c \
 	srcs/exec/wait.c \
 	srcs/expand/expand_escape.c \
 	srcs/expand/expand_hd.c \
@@ -82,6 +83,7 @@ SRCS = \
 	srcs/utils/free.c \
 	srcs/utils/signals_heredoc.c \
 	srcs/utils/signals.c
+
 
 OBJS = $(patsubst $(SRCDIR)/%.c,$(OBJDIR)/%.o,$(SRCS))
 DEPS = $(OBJS:.o=.d)

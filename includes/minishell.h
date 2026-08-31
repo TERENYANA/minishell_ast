@@ -32,8 +32,6 @@
 # include <dirent.h>
 # include "libft.h"
 
-void			rl_replace_line(const char *text, int clear_undo);
-
 extern volatile sig_atomic_t	g_sig;
 
 typedef enum e_token_type
